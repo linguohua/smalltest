@@ -282,19 +282,24 @@ static void heart_rate_meas_timeout_handler(void * p_context)
 
     UNUSED_PARAMETER(p_context);
 
-    heart_rate = (uint16_t)sensorsim_measure(&m_heart_rate_sim_state, &m_heart_rate_sim_cfg);
+    NRF_LOG_INFO("heart_rate_meas_timeout_handler.");
 
-    cnt++;
-    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
-    if ((err_code != NRF_SUCCESS) &&
-        (err_code != NRF_ERROR_INVALID_STATE) &&
-        (err_code != NRF_ERROR_RESOURCES) &&
-        (err_code != NRF_ERROR_BUSY) &&
-        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
-       )
-    {
-        APP_ERROR_HANDLER(err_code);
-    }
+    bsp_board_led_invert(LED_1);
+    bsp_board_led_invert(LED_2);
+//
+//    heart_rate = (uint16_t)sensorsim_measure(&m_heart_rate_sim_state, &m_heart_rate_sim_cfg);
+//
+//    cnt++;
+//    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
+//    if ((err_code != NRF_SUCCESS) &&
+//        (err_code != NRF_ERROR_INVALID_STATE) &&
+//        (err_code != NRF_ERROR_RESOURCES) &&
+//        (err_code != NRF_ERROR_BUSY) &&
+//        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+//       )
+//    {
+//        APP_ERROR_HANDLER(err_code);
+//    }
 
     // Disable RR Interval recording every third heart rate measurement.
     // NOTE: An application will normally not do this. It is done here just for testing generation
@@ -313,6 +318,8 @@ static void heart_rate_meas_timeout_handler(void * p_context)
 static void rr_interval_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
+
+    NRF_LOG_INFO("rr_interval_timeout_handler.");
 
     if (m_rr_interval_enabled)
     {
@@ -560,17 +567,18 @@ static void application_timers_start(void)
     ret_code_t err_code;
 
     // Start application timers.
-    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
-    APP_ERROR_CHECK(err_code);
+//    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+//    APP_ERROR_CHECK(err_code);
+    NRF_LOG_INFO("application_timers_start.");
 
     err_code = app_timer_start(m_heart_rate_timer_id, HEART_RATE_MEAS_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 
-    err_code = app_timer_start(m_rr_interval_timer_id, RR_INTERVAL_INTERVAL, NULL);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = app_timer_start(m_sensor_contact_timer_id, SENSOR_CONTACT_DETECTED_INTERVAL, NULL);
-    APP_ERROR_CHECK(err_code);
+//    err_code = app_timer_start(m_rr_interval_timer_id, RR_INTERVAL_INTERVAL, NULL);
+//    APP_ERROR_CHECK(err_code);
+//
+//    err_code = app_timer_start(m_sensor_contact_timer_id, SENSOR_CONTACT_DETECTED_INTERVAL, NULL);
+//    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -900,8 +908,8 @@ static void buttons_leds_init(bool * p_erase_bonds)
     err_code = bsp_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS, bsp_event_handler);
     APP_ERROR_CHECK(err_code);
 
-    err_code = bsp_btn_ble_init(NULL, &startup_event);
-    APP_ERROR_CHECK(err_code);
+//    err_code = bsp_btn_ble_init(NULL, &startup_event);
+//    APP_ERROR_CHECK(err_code);
 
     *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
 }
@@ -951,13 +959,26 @@ static void idle_state_handle(void)
 int main(void)
 {
     bool erase_bonds;
+//    // Set the external high frequency clock source to 32 MHz
+//    NRF_CLOCK->XTALFREQ = 0xFFFFFF00;
+//
+//    // Start the external high frequency crystal
+//    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+//    NRF_CLOCK->TASKS_HFCLKSTART = 1;
+//
+//    // Wait for the external oscillator to start up
+//    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
+
 
     // Initialize.
     log_init();
     timers_init();
-    buttons_leds_init(&erase_bonds);
+    //buttons_leds_init(&erase_bonds);
+
     power_management_init();
+
     ble_stack_init();
+
     gap_params_init();
     gatt_init();
     advertising_init();
@@ -968,8 +989,25 @@ int main(void)
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
-    application_timers_start();
+    //application_timers_start();
+
     advertising_start(erase_bonds);
+
+    // turn on leds
+    bsp_board_leds_on();
+
+//    sd_clock_hfclk_request();
+//
+//    while(true)
+//    {
+//      uint32_t isRunning = 0;
+//      sd_clock_hfclk_is_running(&isRunning);
+//
+//      if (isRunning != 0)
+//      {
+//        break;
+//      }
+//    }
 
     // Enter main loop.
     for (;;)
@@ -977,5 +1015,4 @@ int main(void)
         idle_state_handle();
     }
 }
-
 
