@@ -284,8 +284,8 @@ static void heart_rate_meas_timeout_handler(void * p_context)
 
     NRF_LOG_INFO("heart_rate_meas_timeout_handler.");
 
-    bsp_board_led_invert(LED_1);
-    bsp_board_led_invert(LED_2);
+    bsp_board_led_invert(0);
+    bsp_board_led_invert(1);
 //
 //    heart_rate = (uint16_t)sensorsim_measure(&m_heart_rate_sim_state, &m_heart_rate_sim_cfg);
 //
@@ -959,21 +959,11 @@ static void idle_state_handle(void)
 int main(void)
 {
     bool erase_bonds;
-//    // Set the external high frequency clock source to 32 MHz
-//    NRF_CLOCK->XTALFREQ = 0xFFFFFF00;
-//
-//    // Start the external high frequency crystal
-//    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-//    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-//
-//    // Wait for the external oscillator to start up
-//    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
-
 
     // Initialize.
     log_init();
     timers_init();
-    //buttons_leds_init(&erase_bonds);
+    buttons_leds_init(&erase_bonds);
 
     power_management_init();
 
@@ -989,25 +979,12 @@ int main(void)
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
-    //application_timers_start();
+    application_timers_start();
 
     advertising_start(erase_bonds);
 
     // turn on leds
     bsp_board_leds_on();
-
-//    sd_clock_hfclk_request();
-//
-//    while(true)
-//    {
-//      uint32_t isRunning = 0;
-//      sd_clock_hfclk_is_running(&isRunning);
-//
-//      if (isRunning != 0)
-//      {
-//        break;
-//      }
-//    }
 
     // Enter main loop.
     for (;;)
