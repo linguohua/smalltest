@@ -82,8 +82,8 @@
 #include "nrf_log_default_backends.h"
 
 
-#define DEVICE_NAME                         "Nordic_HRM"                            /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME                   "NordicSemiconductor"                   /**< Manufacturer. Will be passed to Device Information Service. */
+#define DEVICE_NAME                         "llwant_HRM"                            /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME                   "llwant measurement"                    /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                    300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
 #define APP_ADV_DURATION                    18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
@@ -284,22 +284,23 @@ static void heart_rate_meas_timeout_handler(void * p_context)
 
     NRF_LOG_INFO("heart_rate_meas_timeout_handler.");
 
-    bsp_board_led_invert(0);
-    bsp_board_led_invert(1);
-//
-//    heart_rate = (uint16_t)sensorsim_measure(&m_heart_rate_sim_state, &m_heart_rate_sim_cfg);
-//
-//    cnt++;
-//    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
-//    if ((err_code != NRF_SUCCESS) &&
-//        (err_code != NRF_ERROR_INVALID_STATE) &&
-//        (err_code != NRF_ERROR_RESOURCES) &&
-//        (err_code != NRF_ERROR_BUSY) &&
-//        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
-//       )
-//    {
-//        APP_ERROR_HANDLER(err_code);
-//    }
+    for (int i = 1; i < LEDS_NUMBER; i++) {
+          bsp_board_led_invert(i);
+    }
+
+    heart_rate = (uint16_t)sensorsim_measure(&m_heart_rate_sim_state, &m_heart_rate_sim_cfg);
+
+    cnt++;
+    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
+    if ((err_code != NRF_SUCCESS) &&
+        (err_code != NRF_ERROR_INVALID_STATE) &&
+        (err_code != NRF_ERROR_RESOURCES) &&
+        (err_code != NRF_ERROR_BUSY) &&
+        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+       )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
 
     // Disable RR Interval recording every third heart rate measurement.
     // NOTE: An application will normally not do this. It is done here just for testing generation
@@ -567,18 +568,18 @@ static void application_timers_start(void)
     ret_code_t err_code;
 
     // Start application timers.
-//    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
-//    APP_ERROR_CHECK(err_code);
+    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
     NRF_LOG_INFO("application_timers_start.");
 
     err_code = app_timer_start(m_heart_rate_timer_id, HEART_RATE_MEAS_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 
-//    err_code = app_timer_start(m_rr_interval_timer_id, RR_INTERVAL_INTERVAL, NULL);
-//    APP_ERROR_CHECK(err_code);
-//
-//    err_code = app_timer_start(m_sensor_contact_timer_id, SENSOR_CONTACT_DETECTED_INTERVAL, NULL);
-//    APP_ERROR_CHECK(err_code);
+    err_code = app_timer_start(m_rr_interval_timer_id, RR_INTERVAL_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_start(m_sensor_contact_timer_id, SENSOR_CONTACT_DETECTED_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -677,7 +678,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             break;
 
         case BLE_ADV_EVT_IDLE:
-            sleep_mode_enter();
+            NRF_LOG_INFO("BLE_ADV_EVT_IDLE.");
+            //sleep_mode_enter();
             break;
 
         default:
@@ -805,6 +807,7 @@ void bsp_event_handler(bsp_event_t event)
     switch (event)
     {
         case BSP_EVENT_SLEEP:
+            NRF_LOG_INFO("BSP_EVENT_SLEEP");
             sleep_mode_enter();
             break;
 
@@ -908,8 +911,8 @@ static void buttons_leds_init(bool * p_erase_bonds)
     err_code = bsp_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS, bsp_event_handler);
     APP_ERROR_CHECK(err_code);
 
-//    err_code = bsp_btn_ble_init(NULL, &startup_event);
-//    APP_ERROR_CHECK(err_code);
+    err_code = bsp_btn_ble_init(NULL, &startup_event);
+    APP_ERROR_CHECK(err_code);
 
     *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
 }
@@ -967,7 +970,7 @@ int main(void)
 
     power_management_init();
 
-    ble_stack_init();
+    ble_stack_init();   
 
     gap_params_init();
     gatt_init();

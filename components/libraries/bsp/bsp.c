@@ -108,7 +108,7 @@ static const app_button_cfg_t app_buttons[BUTTONS_NUMBER] =
 #endif // BSP_SIMPLE
 #endif // BUTTONS_NUMBER > 0
 
-#if (BUTTONS_NUMBER > 0)
+//#if (BUTTONS_NUMBER > 0)
 bool bsp_button_is_pressed(uint32_t button)
 {
     if (button < BUTTONS_NUMBER)
@@ -121,7 +121,7 @@ bool bsp_button_is_pressed(uint32_t button)
         return false;
     }
 }
-#endif
+//#endif
 
 #if (BUTTONS_NUMBER > 0) && !(defined BSP_SIMPLE)
 /**@brief Function for handling button events.
