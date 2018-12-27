@@ -1107,7 +1107,7 @@
 #define TWIM_ONLY     (!defined(TWI_PRESENT) &&  defined(TWIM_PRESENT))
 #define TWI_AND_TWIM  ( defined(TWI_PRESENT) &&  defined(TWIM_PRESENT))
 
-#if defined(TWI_ENABLED)
+#if (TWI_ENABLED)
 
 #undef NRFX_TWI_ENABLED
 #define NRFX_TWI_ENABLED   (TWI_ENABLED && (NRFX_TWI0_ENABLED  || NRFX_TWI1_ENABLED))
