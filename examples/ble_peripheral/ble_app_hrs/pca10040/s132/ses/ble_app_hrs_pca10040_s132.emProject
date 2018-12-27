@@ -87,7 +87,9 @@
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_rng.c" />
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uart.c" />
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uarte.c" />
-      <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_i2s.c" />
+      <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c">
+        <configuration Name="Debug" arm_keep_preprocessor_output="No" />
+      </file>
     </folder>
     <folder Name="nRF_Crypto backend uECC">
       <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecc.c" />
