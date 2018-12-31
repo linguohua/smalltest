@@ -800,6 +800,11 @@ static void ble_stack_init(void)
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
 }
 
+static void voice_test()
+{
+    unsigned char bytes[] = {1,2,3,13,10,12,7};
+    voice_play(bytes, sizeof(bytes));
+}
 
 /**@brief Function for handling events from the BSP module.
  *
@@ -808,7 +813,7 @@ static void ble_stack_init(void)
 void bsp_event_handler(bsp_event_t event)
 {
     ret_code_t err_code;
-
+    NRF_LOG_INFO("bsp_event_handler");
     switch (event)
     {
         case BSP_EVENT_SLEEP:
@@ -817,6 +822,7 @@ void bsp_event_handler(bsp_event_t event)
             break;
 
         case BSP_EVENT_DISCONNECT:
+            NRF_LOG_INFO("BSP_EVENT_DISCONNECT");
             err_code = sd_ble_gap_disconnect(m_conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             if (err_code != NRF_ERROR_INVALID_STATE)
@@ -826,6 +832,7 @@ void bsp_event_handler(bsp_event_t event)
             break;
 
         case BSP_EVENT_WHITELIST_OFF:
+            NRF_LOG_INFO("BSP_EVENT_WHITELIST_OFF");
             if (m_conn_handle == BLE_CONN_HANDLE_INVALID)
             {
                 err_code = ble_advertising_restart_without_whitelist(&m_advertising);
@@ -834,6 +841,7 @@ void bsp_event_handler(bsp_event_t event)
                     APP_ERROR_CHECK(err_code);
                 }
             }
+            voice_test();
             break;
 
         default:
@@ -989,14 +997,12 @@ int main(void)
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
-    application_timers_start();
+    //application_timers_start();
 
     advertising_start(erase_bonds);
 
     // turn on leds
     bsp_board_leds_on();
-
-    voice_play(1);
 
     // Enter main loop.
     for (;;)
