@@ -81,6 +81,8 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
+#include "voice.h"
+#include "nrf_delay.h"
 
 #define DEVICE_NAME                         "llwant_HRM"                            /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                   "llwant measurement"                    /**< Manufacturer. Will be passed to Device Information Service. */
@@ -306,6 +308,9 @@ static void heart_rate_meas_timeout_handler(void * p_context)
     // NOTE: An application will normally not do this. It is done here just for testing generation
     // of messages without RR Interval measurements.
     m_rr_interval_enabled = ((cnt % 3) != 0);
+
+
+    //nrf_delay_us(1000*1000);
 }
 
 
@@ -741,11 +746,11 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             APP_ERROR_CHECK(err_code);
             break;
-    
+
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
             NRF_LOG_DEBUG("BLE_GAP_EVT_SEC_PARAMS_REQUEST");
             break;
-        
+
         case BLE_GAP_EVT_AUTH_KEY_REQUEST:
             NRF_LOG_INFO("BLE_GAP_EVT_AUTH_KEY_REQUEST");
             break;
@@ -968,9 +973,11 @@ int main(void)
     timers_init();
     buttons_leds_init(&erase_bonds);
 
+    voice_init();
+
     power_management_init();
 
-    ble_stack_init();   
+    ble_stack_init();
 
     gap_params_init();
     gatt_init();
@@ -989,10 +996,11 @@ int main(void)
     // turn on leds
     bsp_board_leds_on();
 
+    voice_play(1);
+
     // Enter main loop.
     for (;;)
     {
         idle_state_handle();
     }
 }
-

@@ -133,6 +133,9 @@
     <folder Name="Application">
       <file file_name="../../../main.c" />
       <file file_name="../config/sdk_config.h" />
+      <file file_name="../../../voice.c" />
+      <file file_name="../../../voice.h" />
+      <configuration Name="Common" file_codec="UTF-8" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />
