@@ -284,7 +284,7 @@ static void heart_rate_meas_timeout_handler(void * p_context)
 
     UNUSED_PARAMETER(p_context);
 
-    NRF_LOG_INFO("heart_rate_meas_timeout_handler.");
+    //NRF_LOG_INFO("heart_rate_meas_timeout_handler.");
 
     for (int i = 1; i < LEDS_NUMBER; i++) {
           bsp_board_led_invert(i);
@@ -325,7 +325,7 @@ static void rr_interval_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
 
-    NRF_LOG_INFO("rr_interval_timeout_handler.");
+    //NRF_LOG_INFO("rr_interval_timeout_handler.");
 
     if (m_rr_interval_enabled)
     {
@@ -997,7 +997,7 @@ int main(void)
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
-    //application_timers_start();
+    application_timers_start();
 
     advertising_start(erase_bonds);
 
