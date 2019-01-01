@@ -1,6 +1,17 @@
 #include "max30102_driver.h"
+#include "nrf.h"
+#include "app_error.h"
+#include "boards.h"
+#include "app_util_platform.h"
+#include "app_error.h"
+#include "nrf_drv_twi.h"
 
 //I2C i2c(I2C_SDA, I2C_SCL);//SDA-PB9,SCL-PB8
+
+#define TWI_INSTANCE_ID 0
+
+/* TWI instance. */
+static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 
 /** Write to an I2C slave
  *
@@ -16,7 +27,12 @@
  *       0 on success (ack),
  *   non-0 on failure (nack)
  */
-int i2c_write(int address, const char *data, int length, int repeated);
+int i2c_write(int address, const char *data, int length, int repeated)
+{
+    ret_code_t err_code;
+    err_code = nrf_drv_twi_tx(&m_twi, (uint8_t)address, (const uint8_t*)data, (uint8_t)length, repeated);
+    APP_ERROR_CHECK(err_code);
+}
 
 /** Read from an I2C slave
  *
@@ -32,9 +48,28 @@ int i2c_write(int address, const char *data, int length, int repeated);
  *       0 on success (ack),
  *   non-0 on failure (nack)
  */
-int i2c_read(int address, char *data, int length, int repeated);
+int i2c_read(int address, char *data, int length, int repeated)
+{
+    /// /* Read 1 byte from the specified address - skip 3 bits dedicated for fractional part of temperature. */
+    ret_code_t err_code = NRF_SUCCESS;
+    while(length > 0)
+    {
+        err_code = nrf_drv_twi_rx(&m_twi, (uint8_t)address, (uint8_t*)data, (uint8_t)length);
+        APP_ERROR_CHECK(err_code);
 
-int maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
+        if (err_code != 0)
+        {
+            break;
+        }
+
+        length--;
+        data++;
+    };
+
+    return err_code;
+}
+
+bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
 /**
 * \brief        Write a value to a MAX30102 register
 * \par          Details
@@ -56,7 +91,7 @@ int maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
     return false;
 }
 
-int maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data)
+bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data)
 /**
 * \brief        Read a MAX30102 register
 * \par          Details
@@ -81,7 +116,7 @@ int maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data)
     return false;
 }
 
-int maxim_max30102_init()
+bool maxim_max30102_init()
 /**
 * \brief        Initialize the MAX30102
 * \par          Details
@@ -118,7 +153,7 @@ int maxim_max30102_init()
   return true;
 }
 
-int maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
+bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
 /**
 * \brief        Read a set of samples from the MAX30102 FIFO register
 * \par          Details
@@ -171,7 +206,7 @@ int maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
   return true;
 }
 
-int maxim_max30102_reset()
+bool maxim_max30102_reset()
 /**
 * \brief        Reset the MAX30102
 * \par          Details
@@ -186,4 +221,24 @@ int maxim_max30102_reset()
         return false;
     else
         return true;
+}
+
+uint32_t maxim_twi_init(void)
+{
+    ret_code_t err_code;
+
+    const nrf_drv_twi_config_t twi_max30102_config = {
+       .scl                = MAX30102_SCL_PIN,
+       .sda                = MAX30102_SDA_PIN,
+       .frequency          = NRF_DRV_TWI_FREQ_100K,
+       .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
+       .clear_bus_init     = false
+    };
+
+    err_code = nrf_drv_twi_init(&m_twi, &twi_max30102_config, NULL, NULL); /*BLOCK MODE*/
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_twi_enable(&m_twi);
+
+    return err_code;
 }

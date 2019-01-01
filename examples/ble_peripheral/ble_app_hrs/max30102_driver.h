@@ -2,11 +2,15 @@
 #define MAX30102_DRIVER_H
 
 #include "ble.h"
+#include "stdbool.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define MAX30102_INT_PIN 3
+#define MAX30102_SDA_PIN 4
+#define MAX30102_SCL_PIN 5
 
 #define I2C_WRITE_ADDR 0xAE
 #define I2C_READ_ADDR 0xAF
@@ -35,19 +39,13 @@ extern "C" {
 #define REG_REV_ID 0xFE
 #define REG_PART_ID 0xFF
 
-#ifndef  true
-#define true 1
-#endif /*true*/
+uint32_t maxim_twi_init(void);
 
-#ifndef  false
-#define  false 0
-#endif /*false*/
-
-int maxim_max30102_init();
-int maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led);
-int maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
-int maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data);
-int maxim_max30102_reset(void);
+bool maxim_max30102_init();
+bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led);
+bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
+bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data);
+bool maxim_max30102_reset(void);
 
 #ifdef __cplusplus
 }

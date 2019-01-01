@@ -2,19 +2,11 @@
 #define MAX30102_ALGO_H
 
 #include "ble.h"
+#include "stdbool.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-#ifndef  true
-#define true 1
-#endif /*true*/
-
-#ifndef  false
-#define  false 0
-#endif /*false*/
 
 #define FS 100
 #define BUFFER_SIZE  (FS* 5)

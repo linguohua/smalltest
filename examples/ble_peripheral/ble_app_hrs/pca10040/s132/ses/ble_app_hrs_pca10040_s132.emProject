@@ -87,14 +87,8 @@
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_rng.c" />
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uart.c" />
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uarte.c" />
-      <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c">
-        <configuration Name="Debug" arm_keep_preprocessor_output="No" />
-      </file>
-    </folder>
-    <folder Name="nRF_Crypto backend uECC">
-      <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecc.c" />
-      <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdh.c" />
-      <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdsa.c" />
+      <file file_name="../../../../../../integration/nrfx/legacy/nrf_drv_twi.c" />
+      <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c" />
     </folder>
     <folder Name="Board Definition">
       <file file_name="../../../../../../components/boards/boards.c" />
@@ -136,10 +130,10 @@
       <file file_name="../../../voice.c" />
       <file file_name="../../../voice.h" />
       <configuration Name="Common" file_codec="UTF-8" />
-      <file file_name="max30102_driver.h" />
-      <file file_name="max30102_driver.c" />
-      <file file_name="max30102_algo.c" />
-      <file file_name="max30102_algo.h" />
+      <file file_name="../../../max30102_algo.c" />
+      <file file_name="../../../max30102_algo.h" />
+      <file file_name="../../../max30102_driver.c" />
+      <file file_name="../../../max30102_driver.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />
@@ -194,6 +188,11 @@
       <file file_name="../../../../../../components/libraries/crypto/backend/oberon/oberon_backend_eddsa.c" />
       <file file_name="../../../../../../components/libraries/crypto/backend/oberon/oberon_backend_hash.c" />
       <file file_name="../../../../../../components/libraries/crypto/backend/oberon/oberon_backend_hmac.c" />
+    </folder>
+    <folder Name="nRF_Crypto backend uECC">
+      <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecc.c" />
+      <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdh.c" />
+      <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdsa.c" />
     </folder>
   </project>
   <configuration

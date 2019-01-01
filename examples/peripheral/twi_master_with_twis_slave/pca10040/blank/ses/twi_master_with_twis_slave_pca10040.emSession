@@ -1,7 +1,51 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
-  <ARMCrossStudioWindow activeProject="twi_master_with_twis_slave_pca10040" buildConfiguration="Release"/>
-  <Files>
-    <SessionOpenFile codecName="Default" debugPath="../../../main.c" left="0" name="unnamed" path="../../../main.c" selected="1" top="0" useBinaryEdit="0" useTextEdit="1" x="0" y="0"/>
-  </Files>
+ <Bookmarks/>
+ <Breakpoints groups="Breakpoints" active_group="Breakpoints"/>
+ <ExecutionProfileWindow/>
+ <FrameBufferWindow>
+  <FrameBufferWindow bufferHeight="-1" addressSpace="" addressText="" bufferWidth="-1"/>
+ </FrameBufferWindow>
+ <Memory1/>
+ <Memory2/>
+ <Memory3/>
+ <Memory4/>
+ <Project>
+  <ProjectSessionItem path="twi_master_with_twis_slave_pca10040"/>
+  <ProjectSessionItem path="twi_master_with_twis_slave_pca10040;twi_master_with_twis_slave_pca10040"/>
+  <ProjectSessionItem path="twi_master_with_twis_slave_pca10040;twi_master_with_twis_slave_pca10040;Application"/>
+  <ProjectSessionItem path="twi_master_with_twis_slave_pca10040;twi_master_with_twis_slave_pca10040;nRF_Drivers"/>
+ </Project>
+ <Register1/>
+ <Register2/>
+ <Register3/>
+ <Register4/>
+ <Threads>
+  <ThreadsWindow showLists=""/>
+ </Threads>
+ <TraceWindow>
+  <Trace enabled="Yes"/>
+ </TraceWindow>
+ <Watch1>
+  <Watches active="1" update="Never"/>
+ </Watch1>
+ <Watch2>
+  <Watches active="0" update="Never"/>
+ </Watch2>
+ <Watch3>
+  <Watches active="0" update="Never"/>
+ </Watch3>
+ <Watch4>
+  <Watches active="0" update="Never"/>
+ </Watch4>
+ <Files>
+  <SessionOpenFile windowGroup="DockEditLeft" x="13" y="318" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="287" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="96" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../config.h" selected="0" top="78" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="53" y="89" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../integration/nrfx/legacy/nrf_drv_twi.c" selected="0" top="66" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="41" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../modules/nrfx/drivers/src/nrfx_twi.c" selected="0" top="33" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="25" y="146" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c" selected="1" top="141" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="40" y="1118" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../integration/nrfx/legacy/apply_old_config.h" selected="0" top="1103" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="9" y="1045" useTextEdit="1" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="1024" codecName="Default"/>
+ </Files>
+ <ARMCrossStudioWindow activeProject="twi_master_with_twis_slave_pca10040" fileDialogDefaultFilter="" autoConnectTarget="J-Link" buildConfiguration="Release" debugSearchFileMap="" fileDialogInitialDirectory="D:/nRF5_SDK_15.2.0_9412b96/modules/nrfx/drivers/src" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

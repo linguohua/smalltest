@@ -83,6 +83,7 @@
 
 #include "voice.h"
 #include "nrf_delay.h"
+#include "max30102_driver.h"
 
 #define DEVICE_NAME                         "llwant_HRM"                            /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                   "llwant measurement"                    /**< Manufacturer. Will be passed to Device Information Service. */
@@ -994,6 +995,21 @@ int main(void)
     sensor_simulator_init();
     conn_params_init();
     peer_manager_init();
+
+    if (maxim_twi_init() != 0)
+    {
+        NRF_LOG_INFO("twi init failed.");
+    }
+
+    if (!maxim_max30102_reset())
+    {
+        NRF_LOG_INFO("maxim_max30102_reset failed.");
+    }
+
+    if (!maxim_max30102_init())
+    {
+        NRF_LOG_INFO("maxim_max30102_init failed.");
+    }
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
