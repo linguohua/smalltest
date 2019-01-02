@@ -32,6 +32,8 @@ int i2c_write(int address, const char *data, int length, int repeated)
     ret_code_t err_code;
     err_code = nrf_drv_twi_tx(&m_twi, (uint8_t)address, (const uint8_t*)data, (uint8_t)length, repeated);
     APP_ERROR_CHECK(err_code);
+
+    return err_code;
 }
 
 /** Read from an I2C slave

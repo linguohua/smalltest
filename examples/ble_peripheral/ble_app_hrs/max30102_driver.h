@@ -12,8 +12,8 @@ extern "C" {
 #define MAX30102_SDA_PIN 4
 #define MAX30102_SCL_PIN 5
 
-#define I2C_WRITE_ADDR 0xAE
-#define I2C_READ_ADDR 0xAF
+#define I2C_WRITE_ADDR 0x57 // 0xAE
+#define I2C_READ_ADDR 0x57 // 0xAF
 
 //register addresses
 #define REG_INTR_STATUS_1 0x00

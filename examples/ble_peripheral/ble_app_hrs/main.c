@@ -1004,6 +1004,7 @@ int main(void)
     if (!maxim_max30102_reset())
     {
         NRF_LOG_INFO("maxim_max30102_reset failed.");
+        //nrf_delay_ms(100);
     }
 
     if (!maxim_max30102_init())

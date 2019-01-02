@@ -125,7 +125,11 @@
       <file file_name="../../../../../../components/libraries/crypto/nrf_crypto_shared.c" />
     </folder>
     <folder Name="Application">
-      <file file_name="../../../main.c" />
+      <file file_name="../../../main.c">
+        <configuration
+          Name="Debug"
+          c_preprocessor_definitions="NRFX_LOG_MODULE" />
+      </file>
       <file file_name="../config/sdk_config.h" />
       <file file_name="../../../voice.c" />
       <file file_name="../../../voice.h" />
@@ -194,6 +198,7 @@
       <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdh.c" />
       <file file_name="../../../../../../components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdsa.c" />
     </folder>
+    <configuration Name="Debug" c_preprocessor_definitions="" />
   </project>
   <configuration
     Name="Release"
