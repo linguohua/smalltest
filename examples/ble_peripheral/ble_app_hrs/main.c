@@ -84,6 +84,7 @@
 #include "voice.h"
 #include "nrf_delay.h"
 #include "max30102_driver.h"
+#include "max30102_algo.h"
 
 #define DEVICE_NAME                         "llwant_HRM"                            /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                   "llwant measurement"                    /**< Manufacturer. Will be passed to Device Information Service. */
@@ -161,6 +162,8 @@ static ble_uuid_t m_adv_uuids[] =                                   /**< Univers
     {BLE_UUID_DEVICE_INFORMATION_SERVICE,   BLE_UUID_TYPE_BLE}
 };
 
+static uint32_t aun_red_buffer[500];    //Red LED sensor data
+static uint32_t aun_ir_buffer[500]; //IR LED sensor data
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -970,6 +973,43 @@ static void idle_state_handle(void)
     }
 }
 
+static void test_hr()
+{
+    // read 500 samples
+    const int sampleCount =500; //buffer length of 100 stores 5 seconds of samples running at 100sps
+
+    //read the first 500 samples, and determine the signal range
+    for(int i=0;i < sampleCount;i++)
+    {
+        while(!maxim_max30102_data_ready());   //wait until the interrupt pin asserts
+
+        if(!maxim_max30102_read_fifo((aun_red_buffer+i), (aun_ir_buffer+i))) //read from MAX30102 FIFO
+        {
+            NRF_LOG_INFO("maxim_max30102_read_fifo read failed");
+            return;
+        }
+
+//        if(un_min>aun_red_buffer[i])
+//            un_min=aun_red_buffer[i];    //update signal min
+//        if(un_max<aun_red_buffer[i])
+//            un_max=aun_red_buffer[i];    //update signal max
+        //NRF_LOG_INFO("red=%i, ir=%i", aun_red_buffer[i], aun_ir_buffer[i]);
+        //NRF_LOG_FLUSH();
+    }
+
+    //calculate heart rate and SpO2 after first 500 samples (first 5 seconds of samples)
+    int8_t ch_spo2_valid = 0;
+    int8_t ch_hr_valid = 0;
+    int32_t n_sp02 = 0;
+    int32_t n_heart_rate = 0;
+
+    maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, sampleCount, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+
+    NRF_LOG_INFO("ch_spo2_valid=%i, ch_hr_validr=%i, n_sp02=%i, n_heart_rate=%i", (int32_t)ch_spo2_valid,
+        (int32_t)ch_hr_valid,n_sp02, n_heart_rate);
+
+    NRF_LOG_FLUSH();
+}
 
 /**@brief Function for application main entry.
  */
@@ -999,17 +1039,32 @@ int main(void)
     if (maxim_twi_init() != 0)
     {
         NRF_LOG_INFO("twi init failed.");
+        APP_ERROR_CHECK_BOOL(false);
     }
 
     if (!maxim_max30102_reset())
     {
         NRF_LOG_INFO("maxim_max30102_reset failed.");
-        //nrf_delay_ms(100);
+        APP_ERROR_CHECK_BOOL(false);
     }
+
+    //read and clear status register
+    uint8_t uch_dummy;
+    maxim_max30102_read_reg(0,&uch_dummy);
+    maxim_max30102_read_reg(1,&uch_dummy);
 
     if (!maxim_max30102_init())
     {
         NRF_LOG_INFO("maxim_max30102_init failed.");
+        APP_ERROR_CHECK_BOOL(false);
+    }
+
+
+    nrf_delay_ms(1000);
+    while(1)
+    {
+        test_hr();
+        nrf_delay_ms(1000);
     }
 
     // Start execution.

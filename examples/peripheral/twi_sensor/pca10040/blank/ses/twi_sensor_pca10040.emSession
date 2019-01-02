@@ -39,12 +39,13 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="114" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="81" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="166" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="133" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="59" useTextEdit="1" useBinaryEdit="0" left="0" path="D:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 4.12/include/stdbool.h" selected="0" top="23" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="476" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../integration/nrfx/legacy/nrf_drv_twi.h" selected="0" top="458" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="192" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../integration/nrfx/legacy/nrf_drv_twi.c" selected="0" top="159" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="664" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c" selected="1" top="635" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="664" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c" selected="0" top="635" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="261" useTextEdit="1" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="243" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="148" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/boards/pca10040.h" selected="0" top="124" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="twi_sensor_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

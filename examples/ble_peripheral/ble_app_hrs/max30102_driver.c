@@ -5,6 +5,7 @@
 #include "app_util_platform.h"
 #include "app_error.h"
 #include "nrf_drv_twi.h"
+#include "nrf_log.h"
 
 //I2C i2c(I2C_SDA, I2C_SCL);//SDA-PB9,SCL-PB8
 
@@ -52,21 +53,9 @@ int i2c_write(int address, const char *data, int length, int repeated)
  */
 int i2c_read(int address, char *data, int length, int repeated)
 {
-    /// /* Read 1 byte from the specified address - skip 3 bits dedicated for fractional part of temperature. */
     ret_code_t err_code = NRF_SUCCESS;
-    while(length > 0)
-    {
-        err_code = nrf_drv_twi_rx(&m_twi, (uint8_t)address, (uint8_t*)data, (uint8_t)length);
-        APP_ERROR_CHECK(err_code);
-
-        if (err_code != 0)
-        {
-            break;
-        }
-
-        length--;
-        data++;
-    };
+    err_code = nrf_drv_twi_rx(&m_twi, (uint8_t)address, (uint8_t*)data, (uint8_t)length);
+    APP_ERROR_CHECK(err_code);
 
     return err_code;
 }
@@ -131,6 +120,7 @@ bool maxim_max30102_init()
 {
   if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0xc0)) // INTR setting
     return false;
+
   if(!maxim_max30102_write_reg(REG_INTR_ENABLE_2,0x00))
     return false;
   if(!maxim_max30102_write_reg(REG_FIFO_WR_PTR,0x00))  //FIFO_WR_PTR[4:0]
@@ -141,7 +131,7 @@ bool maxim_max30102_init()
     return false;
   if(!maxim_max30102_write_reg(REG_FIFO_CONFIG,0x0f))  //sample avg = 1, fifo rollover=false, fifo almost full = 17
     return false;
-  if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x03))   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
+  if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x02))   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
     return false;
   if(!maxim_max30102_write_reg(REG_SPO2_CONFIG,0x27))  // SPO2_ADC range = 4096nA, SPO2 sample rate (100 Hz), LED pulseWidth (400uS)
     return false;
@@ -228,11 +218,12 @@ bool maxim_max30102_reset()
 uint32_t maxim_twi_init(void)
 {
     ret_code_t err_code;
+    nrf_gpio_cfg_input(MAX30102_INT_PIN, NRF_GPIO_PIN_NOPULL);
 
     const nrf_drv_twi_config_t twi_max30102_config = {
        .scl                = MAX30102_SCL_PIN,
        .sda                = MAX30102_SDA_PIN,
-       .frequency          = NRF_DRV_TWI_FREQ_100K,
+       .frequency          = NRF_DRV_TWI_FREQ_400K,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
     };
@@ -243,4 +234,14 @@ uint32_t maxim_twi_init(void)
     nrf_drv_twi_enable(&m_twi);
 
     return err_code;
+}
+
+bool maxim_max30102_data_ready()
+{
+    if (nrf_gpio_pin_read(MAX30102_INT_PIN))
+    {
+        return false;
+    }
+
+    return true;
 }

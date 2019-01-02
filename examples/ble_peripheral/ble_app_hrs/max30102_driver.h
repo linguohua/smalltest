@@ -41,6 +41,7 @@ extern "C" {
 
 uint32_t maxim_twi_init(void);
 
+bool maxim_max30102_data_ready();
 bool maxim_max30102_init();
 bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led);
 bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
