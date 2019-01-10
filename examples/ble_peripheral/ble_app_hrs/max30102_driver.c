@@ -131,7 +131,7 @@ bool maxim_max30102_init()
     return false;
   if(!maxim_max30102_write_reg(REG_FIFO_CONFIG,0x0f))  //sample avg = 1, fifo rollover=false, fifo almost full = 17
     return false;
-  if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x02))   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
+  if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x03))   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
     return false;
   if(!maxim_max30102_write_reg(REG_SPO2_CONFIG,0x27))  // SPO2_ADC range = 4096nA, SPO2 sample rate (100 Hz), LED pulseWidth (400uS)
     return false;
@@ -223,7 +223,7 @@ uint32_t maxim_twi_init(void)
     const nrf_drv_twi_config_t twi_max30102_config = {
        .scl                = MAX30102_SCL_PIN,
        .sda                = MAX30102_SDA_PIN,
-       .frequency          = NRF_DRV_TWI_FREQ_400K,
+       .frequency          = NRF_DRV_TWI_FREQ_100K,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
     };

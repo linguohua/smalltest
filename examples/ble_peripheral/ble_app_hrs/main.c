@@ -162,8 +162,8 @@ static ble_uuid_t m_adv_uuids[] =                                   /**< Univers
     {BLE_UUID_DEVICE_INFORMATION_SERVICE,   BLE_UUID_TYPE_BLE}
 };
 
-static uint32_t aun_red_buffer[500];    //Red LED sensor data
-static uint32_t aun_ir_buffer[500]; //IR LED sensor data
+static uint32_t aun_red_buffer[BUFFER_SIZE];    //Red LED sensor data
+static uint32_t aun_ir_buffer[BUFFER_SIZE]; //IR LED sensor data
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -975,10 +975,10 @@ static void idle_state_handle(void)
 
 static void test_hr()
 {
-    // read 500 samples
-    const int sampleCount =500; //buffer length of 100 stores 5 seconds of samples running at 100sps
+    // read SAMPLE_BUFFER_SIZE samples
+    const int sampleCount =BUFFER_SIZE; //buffer length of 100 stores 5 seconds of samples running at 100sps
 
-    //read the first 500 samples, and determine the signal range
+    //read the first SAMPLE_BUFFER_SIZE samples, and determine the signal range
     for(int i=0;i < sampleCount;i++)
     {
         while(!maxim_max30102_data_ready());   //wait until the interrupt pin asserts
@@ -993,8 +993,8 @@ static void test_hr()
 //            un_min=aun_red_buffer[i];    //update signal min
 //        if(un_max<aun_red_buffer[i])
 //            un_max=aun_red_buffer[i];    //update signal max
-        //NRF_LOG_INFO("red=%i, ir=%i", aun_red_buffer[i], aun_ir_buffer[i]);
-        //NRF_LOG_FLUSH();
+        NRF_LOG_INFO("red=%i, ir=%i", aun_red_buffer[i], aun_ir_buffer[i]);
+        NRF_LOG_FLUSH();
     }
 
     //calculate heart rate and SpO2 after first 500 samples (first 5 seconds of samples)
@@ -1064,7 +1064,7 @@ int main(void)
     while(1)
     {
         test_hr();
-        nrf_delay_ms(1000);
+        //nrf_delay_ms(1000);
     }
 
     // Start execution.
