@@ -84,7 +84,7 @@
 #include "voice.h"
 #include "nrf_delay.h"
 #include "max30102_driver.h"
-#include "max30102_algo.h"
+#include "max30102_algo2.h"
 
 #define DEVICE_NAME                         "llwant_HRM"                            /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                   "llwant measurement"                    /**< Manufacturer. Will be passed to Device Information Service. */
@@ -986,8 +986,10 @@ static void test_hr()
     n_ir_buffer_length=500; //buffer length of 100 stores 5 seconds of samples running at 100sps
     int8_t ch_spo2_valid = 0;
     int8_t ch_hr_valid = 0;
-    int32_t n_sp02 = 0;
+    float n_sp02 = 0;
     int32_t n_heart_rate = 0;
+    float ratio;
+    float correl;
 
     //read the first 500 samples, and determine the signal range
     for(i=0;i<n_ir_buffer_length;i++)
@@ -1010,8 +1012,12 @@ static void test_hr()
     un_prev_data=aun_red_buffer[i];
 
 
+//void rf_heart_rate_and_oxygen_saturation(uint32_t *pun_ir_buffer, int32_t n_ir_buffer_length, uint32_t *pun_red_buffer, float *pn_spo2, int8_t *pch_spo2_valid, int32_t *pn_heart_rate,
+//                                        int8_t *pch_hr_valid, float *ratio, float *correl);
+
     //calculate heart rate and SpO2 after first 500 samples (first 5 seconds of samples)
-    maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+    rf_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid,
+        &ratio, &correl);
 
     //Continuously taking samples from MAX30102.  Heart rate and SpO2 are calculated every 1 second
     while(1)
@@ -1020,9 +1026,13 @@ static void test_hr()
         un_min=0x3FFFF;
         un_max=0;
 
+        NRF_LOG_INFO("red=");
+        NRF_LOG_INFO("%i", aun_red_buffer[i]);
+        NRF_LOG_INFO(", ir=");
+        NRF_LOG_INFO("%i", aun_ir_buffer[i]);
         NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
         NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
-        NRF_LOG_INFO("SpO2=%i, ", n_sp02);
+        NRF_LOG_INFO("SpO2=%f, ", n_sp02);
         NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
 
         //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
@@ -1082,7 +1092,9 @@ static void test_hr()
 
             NRF_LOG_FLUSH();
         }
-        maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+//        maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+    rf_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid,
+        &ratio, &correl);
     }
 }
 
