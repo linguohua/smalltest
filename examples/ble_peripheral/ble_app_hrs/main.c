@@ -973,42 +973,112 @@ static void idle_state_handle(void)
     }
 }
 
+#define MAX_BRIGHTNESS 255
+static int32_t n_ir_buffer_length;
 static void test_hr()
 {
-    // read SAMPLE_BUFFER_SIZE samples
-    const int sampleCount =BUFFER_SIZE; //buffer length of 100 stores 5 seconds of samples running at 100sps
-
-    //read the first SAMPLE_BUFFER_SIZE samples, and determine the signal range
-    for(int i=0;i < sampleCount;i++)
-    {
-        while(!maxim_max30102_data_ready());   //wait until the interrupt pin asserts
-
-        if(!maxim_max30102_read_fifo((aun_red_buffer+i), (aun_ir_buffer+i))) //read from MAX30102 FIFO
-        {
-            NRF_LOG_INFO("maxim_max30102_read_fifo read failed");
-            return;
-        }
-
-//        if(un_min>aun_red_buffer[i])
-//            un_min=aun_red_buffer[i];    //update signal min
-//        if(un_max<aun_red_buffer[i])
-//            un_max=aun_red_buffer[i];    //update signal max
-        NRF_LOG_INFO("red=%i, ir=%i", aun_red_buffer[i], aun_ir_buffer[i]);
-        NRF_LOG_FLUSH();
-    }
-
-    //calculate heart rate and SpO2 after first 500 samples (first 5 seconds of samples)
+    int un_prev_data;
+    int n_brightness=0;
+    int un_min=0x3FFFF;
+    int un_max=0;
+    int i;
+    int f_temp;
+    n_ir_buffer_length=500; //buffer length of 100 stores 5 seconds of samples running at 100sps
     int8_t ch_spo2_valid = 0;
     int8_t ch_hr_valid = 0;
     int32_t n_sp02 = 0;
     int32_t n_heart_rate = 0;
 
-    maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, sampleCount, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+    //read the first 500 samples, and determine the signal range
+    for(i=0;i<n_ir_buffer_length;i++)
+    {
+        while(!maxim_max30102_data_ready());   //wait until the interrupt pin asserts
 
-    NRF_LOG_INFO("ch_spo2_valid=%i, ch_hr_validr=%i, n_sp02=%i, n_heart_rate=%i", (int32_t)ch_spo2_valid,
-        (int32_t)ch_hr_valid,n_sp02, n_heart_rate);
+        maxim_max30102_read_fifo((aun_red_buffer+i), (aun_ir_buffer+i));  //read from MAX30102 FIFO
 
-    NRF_LOG_FLUSH();
+        if(un_min>aun_red_buffer[i])
+            un_min=aun_red_buffer[i];    //update signal min
+        if(un_max<aun_red_buffer[i])
+            un_max=aun_red_buffer[i];    //update signal max
+        NRF_LOG_INFO("red=");
+        NRF_LOG_INFO("%i", aun_red_buffer[i]);
+        NRF_LOG_INFO(", ir=");
+        NRF_LOG_INFO("%i\n\r", aun_ir_buffer[i]);
+
+        NRF_LOG_FLUSH();
+    }
+    un_prev_data=aun_red_buffer[i];
+
+
+    //calculate heart rate and SpO2 after first 500 samples (first 5 seconds of samples)
+    maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+
+    //Continuously taking samples from MAX30102.  Heart rate and SpO2 are calculated every 1 second
+    while(1)
+    {
+        i=0;
+        un_min=0x3FFFF;
+        un_max=0;
+
+        //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
+        for(i=100;i<500;i++)
+        {
+            aun_red_buffer[i-100]=aun_red_buffer[i];
+            aun_ir_buffer[i-100]=aun_ir_buffer[i];
+
+            //update the signal min and max
+            if(un_min>aun_red_buffer[i])
+            un_min=aun_red_buffer[i];
+            if(un_max<aun_red_buffer[i])
+            un_max=aun_red_buffer[i];
+        }
+
+        //take 100 sets of samples before calculating the heart rate.
+        for(i=400;i<500;i++)
+        {
+            un_prev_data=aun_red_buffer[i-1];
+            while(!maxim_max30102_data_ready());   //wait until the interrupt pin asserts
+            maxim_max30102_read_fifo((aun_red_buffer+i), (aun_ir_buffer+i));
+
+            if(aun_red_buffer[i]>un_prev_data)//just to determine the brightness of LED according to the deviation of adjacent two AD data
+            {
+                f_temp=aun_red_buffer[i]-un_prev_data;
+                f_temp/=(un_max-un_min);
+                f_temp*=MAX_BRIGHTNESS;
+                n_brightness-=(int)f_temp;
+                if(n_brightness<0)
+                    n_brightness=0;
+            }
+            else
+            {
+                f_temp=un_prev_data-aun_red_buffer[i];
+                f_temp/=(un_max-un_min);
+                f_temp*=MAX_BRIGHTNESS;
+                n_brightness+=(int)f_temp;
+                if(n_brightness>MAX_BRIGHTNESS)
+                    n_brightness=MAX_BRIGHTNESS;
+            }
+
+//            pwmled.write(1-(float)n_brightness/256);//pwm control led brightness
+//                        if(n_brightness<120)
+//                            led=1;
+//                        else
+//                            led=0;
+
+            //send samples and calculation result to terminal program through UART
+            NRF_LOG_INFO("red=");
+            NRF_LOG_INFO("%i", aun_red_buffer[i]);
+            NRF_LOG_INFO(", ir=");
+            NRF_LOG_INFO("%i", aun_ir_buffer[i]);
+            NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
+            NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
+            NRF_LOG_INFO("SpO2=%i, ", n_sp02);
+            NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
+
+            NRF_LOG_FLUSH();
+        }
+        maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+    }
 }
 
 /**@brief Function for application main entry.
@@ -1061,11 +1131,7 @@ int main(void)
 
 
     nrf_delay_ms(1000);
-    while(1)
-    {
-        test_hr();
-        //nrf_delay_ms(1000);
-    }
+    test_hr();
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
