@@ -1020,6 +1020,11 @@ static void test_hr()
         un_min=0x3FFFF;
         un_max=0;
 
+        NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
+        NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
+        NRF_LOG_INFO("SpO2=%i, ", n_sp02);
+        NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
+
         //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
         for(i=100;i<500;i++)
         {
@@ -1066,14 +1071,14 @@ static void test_hr()
 //                            led=0;
 
             //send samples and calculation result to terminal program through UART
-            NRF_LOG_INFO("red=");
-            NRF_LOG_INFO("%i", aun_red_buffer[i]);
-            NRF_LOG_INFO(", ir=");
-            NRF_LOG_INFO("%i", aun_ir_buffer[i]);
-            NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
-            NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
-            NRF_LOG_INFO("SpO2=%i, ", n_sp02);
-            NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
+//            NRF_LOG_INFO("red=");
+//            NRF_LOG_INFO("%i", aun_red_buffer[i]);
+//            NRF_LOG_INFO(", ir=");
+//            NRF_LOG_INFO("%i", aun_ir_buffer[i]);
+//            NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
+//            NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
+//            NRF_LOG_INFO("SpO2=%i, ", n_sp02);
+//            NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
 
             NRF_LOG_FLUSH();
         }
