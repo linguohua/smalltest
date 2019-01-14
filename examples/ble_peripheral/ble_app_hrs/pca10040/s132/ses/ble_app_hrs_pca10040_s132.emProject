@@ -140,6 +140,8 @@
       <file file_name="../../../max30102_driver.h" />
       <file file_name="../../../max30102_algo2.c" />
       <file file_name="../../../max30102_algo2.h" />
+      <file file_name="../../../myuart.c" />
+      <file file_name="../../../myuart.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />

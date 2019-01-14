@@ -86,6 +86,8 @@
 #include "max30102_driver.h"
 #include "max30102_algo2.h"
 
+#include "myuart.h"
+
 #define DEVICE_NAME                         "llwant_HRM"                            /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                   "llwant measurement"                    /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                    300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
@@ -1035,6 +1037,8 @@ static void test_hr()
         NRF_LOG_INFO("SpO2=%f, ", n_sp02);
         NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
 
+        myuart_printf("world:%i\r\n", n_heart_rate);
+
         //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
         for(i=100;i<500;i++)
         {
@@ -1110,6 +1114,7 @@ int main(void)
     buttons_leds_init(&erase_bonds);
 
     voice_init();
+    myuart_init(true);
 
     power_management_init();
 
