@@ -1037,7 +1037,7 @@ static void test_hr()
         NRF_LOG_INFO("SpO2=%f, ", n_sp02);
         NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
 
-        myuart_printf("world:%i\r\n", n_heart_rate);
+        NRF_LOG_FLUSH();
 
         //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
         for(i=100;i<500;i++)
@@ -1093,8 +1093,9 @@ static void test_hr()
 //            NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
 //            NRF_LOG_INFO("SpO2=%i, ", n_sp02);
 //            NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
+            myuart_printf("r:%i\r\n", aun_red_buffer[i]);
+            myuart_printf("ir:%i\r\n", aun_ir_buffer[i]);
 
-            NRF_LOG_FLUSH();
         }
 //        maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
     rf_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid,

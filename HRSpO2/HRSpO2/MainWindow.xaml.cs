@@ -13,11 +13,28 @@ namespace HRSpO2
     {
         private Serial.MySerialPort mySerialPort;
 
+        private byte[] loggerBuffer = new byte[10*1024];
+        private int loggerBufferWriteIndex = 0;
+        private bool loggerBufferOverflow = false;
+
+
+        private System.Windows.Threading.DispatcherTimer dispatcherTimer;
+
         public MainWindow()
         {
             InitializeComponent();
 
             Button_Refresh_Port_Click(null, null);
+
+            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 500);
+            dispatcherTimer.Start();
+        }
+
+        private void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateLoggerText();
         }
 
         private void Button_Refresh_Port_Click(object sender, RoutedEventArgs e)
@@ -102,13 +119,69 @@ namespace HRSpO2
 
         private void OnSerialPortDataRecv(byte[] buffer, int count)
         {
-            var str = System.Text.Encoding.ASCII.GetString(buffer, 0, count);
-            this.Dispatcher.InvokeAsync(() =>
+            lock (this)
             {
-                TbLogger.Text += str;
-                TbLogger.CaretIndex = TbLogger.Text.Length;
-                TbLogger.ScrollToEnd();
-            });
+                var remain = loggerBuffer.Length - loggerBufferWriteIndex;
+                var copy = count;
+                if (copy > remain)
+                {
+                    copy = remain;
+                }
+
+                if (copy == 0)
+                {
+                    loggerBufferOverflow = true;
+                    return;
+                }
+
+                Array.Copy(buffer, 0, loggerBuffer, loggerBufferWriteIndex, copy);
+                loggerBufferWriteIndex += copy;
+            }
+        }
+
+
+        private void UpdateLoggerText()
+        {
+            string str = null;
+            lock(this)
+            {
+                var buffer = loggerBuffer;
+                var count = loggerBufferWriteIndex;
+
+                if (count < 1)
+                {
+                    return;
+                }
+
+                str = System.Text.Encoding.ASCII.GetString(buffer, 0, count);
+
+                loggerBufferWriteIndex = 0;
+                if (loggerBufferOverflow)
+                {
+                    loggerBufferOverflow = false;
+                    AppendLoggerText("----logger overflow\r\n");
+                }
+            }
+
+            if (str != null)
+            {
+                AppendLoggerText(str);
+            }
+        }
+
+        private void AppendLoggerText(string str)
+        {
+            int length = TbLogger.Text.Length;
+            if (length > 100 * 1024)
+            {
+                length = 0;
+                TbLogger.Text = "----Logger exceed max, clear\r\n";
+            }
+
+            TbLogger.Text += str;
+
+            TbLogger.CaretIndex = (length+ str.Length);
+            TbLogger.ScrollToEnd();
         }
 
         private Serial.SerialPortCfg CollectPortCfg()
