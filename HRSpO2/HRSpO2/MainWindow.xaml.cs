@@ -269,6 +269,20 @@ namespace HRSpO2
 
             wnd.Owner = this;
             wnd.Show();
+
+            List<DataPoint> fft;
+            Data.LogParser.FFT(reds, out fft);
+
+            var fftWnd = new LogPlotWnd();
+            fftWnd.MyModel.Title = "fft";
+            fftWnd.MyModel.Series.Clear();
+            var s3 = new OxyPlot.Series.LineSeries();
+            s3.Title = "red";
+            s3.Points.AddRange(fft);
+            fftWnd.MyModel.Series.Add(s3);
+
+            fftWnd.Owner = this;
+            fftWnd.Show();
         }
     }
 }

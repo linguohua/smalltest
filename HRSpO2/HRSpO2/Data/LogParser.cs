@@ -1,6 +1,7 @@
 ﻿using OxyPlot;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 
 namespace HRSpO2.Data
 {
@@ -59,6 +60,38 @@ namespace HRSpO2.Data
             }
 
             return reds.Count > 0 || ireds.Count > 0;
+        }
+
+        public static bool FFT(List<DataPoint> data, out List<DataPoint> output)
+        {
+            output = new List<DataPoint>();
+
+            const int sampleRate = 100;
+
+            var n = (int)(data.Count/100) * 100;
+            var complex = new Complex[n];
+            var used = 0;
+            foreach(var dp in data)
+            {
+                complex[used] = new Complex(dp.Y, 0d);
+                used++;
+
+                if (used == n)
+                {
+                    break;
+                }
+            }
+
+            MathNet.Numerics.IntegralTransforms.Fourier.Forward(complex);
+
+            var freq = MathNet.Numerics.IntegralTransforms.Fourier.FrequencyScale(n, sampleRate);
+
+            for (var i = 0; i < n; i++)
+            {
+                output.Add(new DataPoint(freq[i], complex[i].Magnitude));
+            }
+
+            return true;
         }
     }
 }
