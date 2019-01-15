@@ -33,7 +33,7 @@ namespace HRSpO2.Data
                         break;
                     }
 
-                    if (line2.StartsWith("ir:"))
+                    if (!line2.StartsWith("ir:"))
                     {
                         continue;
                     }

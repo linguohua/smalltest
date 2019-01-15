@@ -263,8 +263,8 @@ namespace HRSpO2
             model.Series.Add(s1);
 
             var s2 = new OxyPlot.Series.LineSeries();
-            s1.Title = "IR";
-            s1.Points.AddRange(ireds);
+            s2.Title = "IR";
+            s2.Points.AddRange(ireds);
             model.Series.Add(s2);
 
             wnd.Owner = this;
