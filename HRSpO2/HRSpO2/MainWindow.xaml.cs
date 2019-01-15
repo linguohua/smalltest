@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OxyPlot;
+using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Management;
@@ -234,6 +235,40 @@ namespace HRSpO2
         private void Button_Clear_Click(object sender, RoutedEventArgs e)
         {
             TbLogger.Text = "";
+        }
+
+        private void Button_Plot_Click(object sender, RoutedEventArgs e)
+        {
+            var text = TbLogger.Text;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            List<DataPoint> reds;
+            List<DataPoint> ireds;
+            if (!Data.LogParser.Parse(text, out reds, out ireds))
+            {
+                return;
+            }
+
+            var wnd = new LogPlotWnd();
+            var model = wnd.MyModel;
+            model.Title = "R-IR";
+            model.Series.Clear();
+
+            var s1 = new OxyPlot.Series.LineSeries();
+            s1.Title = "R";
+            s1.Points.AddRange(reds);
+            model.Series.Add(s1);
+
+            var s2 = new OxyPlot.Series.LineSeries();
+            s1.Title = "IR";
+            s1.Points.AddRange(ireds);
+            model.Series.Add(s2);
+
+            wnd.Owner = this;
+            wnd.Show();
         }
     }
 }
