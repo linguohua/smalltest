@@ -86,7 +86,7 @@ namespace HRSpO2.Data
 
             var freq = MathNet.Numerics.IntegralTransforms.Fourier.FrequencyScale(n, sampleRate);
 
-            for (var i = 0; i < n; i++)
+            for (var i = 0; i < n/2; i++)
             {
                 output.Add(new DataPoint(freq[i], complex[i].Magnitude));
             }
@@ -94,7 +94,7 @@ namespace HRSpO2.Data
             return true;
         }
 
-        public static void MoveAverage(List<DataPoint> data, out List<DataPoint> output)
+        public static void MoveAverage(List<DataPoint> data, int window, out List<DataPoint> output)
         {
             output = new List<DataPoint>();
 
@@ -109,8 +109,8 @@ namespace HRSpO2.Data
 
             float[] odata = new float[total];
             float sum = 0;
-            const int windowSizeMax = 51;
-            const int half = (int)windowSizeMax/2;
+            int windowSizeMax = window;
+            int half = (int)windowSizeMax/2;
             int feed = 0;
             int windowSize = 0;
             index = 0;
