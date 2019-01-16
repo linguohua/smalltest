@@ -262,6 +262,13 @@ namespace HRSpO2
             s1.Points.AddRange(reds);
             model.Series.Add(s1);
 
+            List<DataPoint> redsMV;
+            Data.LogParser.MoveAverage(reds, out redsMV);
+            var s11 = new OxyPlot.Series.LineSeries();
+            s11.Title = "R-MV";
+            s11.Points.AddRange(redsMV);
+            model.Series.Add(s11);
+
             var s2 = new OxyPlot.Series.LineSeries();
             s2.Title = "IR";
             s2.Points.AddRange(ireds);
@@ -271,7 +278,9 @@ namespace HRSpO2
             wnd.Show();
 
             List<DataPoint> fft;
-            Data.LogParser.FFT(reds, out fft);
+            List<DataPoint> osc;
+            Data.LogParser.Sub(reds, redsMV, out osc);
+            Data.LogParser.FFT(osc, out fft);
 
             var fftWnd = new LogPlotWnd();
             fftWnd.MyModel.Title = "fft";

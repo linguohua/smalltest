@@ -93,5 +93,85 @@ namespace HRSpO2.Data
 
             return true;
         }
+
+        public static void MoveAverage(List<DataPoint> data, out List<DataPoint> output)
+        {
+            output = new List<DataPoint>();
+
+            int total = data.Count;
+            float[] fdata = new float[total];
+            var index = 0;
+            foreach(var dp in data)
+            {
+                fdata[index] = (float)dp.Y;
+                index++;
+            }
+
+            float[] odata = new float[total];
+            float sum = 0;
+            const int windowSizeMax = 51;
+            const int half = (int)windowSizeMax/2;
+            int feed = 0;
+            int windowSize = 0;
+            index = 0;
+
+            for (var i = 0; i < (1+half) && feed < total; i++)
+            {
+                sum += fdata[feed];
+                feed++;
+                windowSize++;
+            }
+
+            for (; index < (half) && feed < total; )
+            {
+                odata[index] = sum / (float)windowSize;
+
+                sum += fdata[feed];
+
+                feed++;
+                index++;
+                windowSize++;
+            }
+
+            for (; feed < total;)
+            {
+                odata[index] = sum / (float)windowSize;
+
+                sum += fdata[feed];
+                sum -= fdata[feed - windowSize];
+
+                feed++;
+                index++;
+            }
+
+            for (; index < total;)
+            {
+                odata[index] = sum / (float)windowSize;
+
+                windowSize--;
+                sum -= fdata[total - windowSize];
+                index++;
+            }
+
+            index = 0;
+            foreach(var y in odata)
+            {
+                output.Add(new DataPoint(index, y));
+                index++;
+            }
+        }
+
+        public static void Sub(List<DataPoint> src1, List<DataPoint> src2, out List<DataPoint> output)
+        {
+            output = new List<DataPoint>();
+
+            var src2Array = src2.ToArray();
+            var i = 0;
+            foreach(var dp in src1)
+            {
+                output.Add(new DataPoint(dp.X, (dp.Y - src2Array[i].Y)));
+                i++;
+            }
+        }
     }
 }
