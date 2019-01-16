@@ -6,7 +6,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:HRSpO2"
         mc:Ignorable="d"
-        Title="LogPlot" Height="300" Width="300" WindowStartupLocation="CenterOwner">
+        Title="LogPlot" Height="300" Width="300" WindowStartupLocation="CenterOwner" Icon="heartbeat32.ico">
     <Grid>
         <oxy:PlotView Model="{Binding MyModel}"/>
     </Grid>

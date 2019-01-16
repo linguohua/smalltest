@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HRSpO2"
         mc:Ignorable="d"
-        Title="HRSpO2-MainWindow" Height="650" Width="800" WindowStartupLocation="CenterScreen">
+        Title="HRSpO2-MainWindow" Height="650" Width="800" WindowStartupLocation="CenterScreen" Icon="heartbeat32.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" MinWidth="200"></ColumnDefinition>
