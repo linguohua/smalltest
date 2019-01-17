@@ -94,6 +94,23 @@ namespace HRSpO2.Data
             return true;
         }
 
+        public static float FFTMaxAmplitude(List<DataPoint> fft)
+        {
+            double amplitude = 0;
+            float freq = 0;
+
+            foreach (var dp in fft)
+            {
+                if (dp.Y > amplitude)
+                {
+                    amplitude = dp.Y;
+                    freq = (float)dp.X;
+                }
+            }
+
+            return freq;
+        }
+
         public static void MoveAverage(List<DataPoint> data, int window, out List<DataPoint> output)
         {
             output = new List<DataPoint>();

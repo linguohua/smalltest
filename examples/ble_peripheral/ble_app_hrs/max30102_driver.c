@@ -138,7 +138,7 @@ bool maxim_max30102_init()
 
   if(!maxim_max30102_write_reg(REG_LED1_PA,0x24))   //Choose value for ~ 7mA for LED1
     return false;
-  if(!maxim_max30102_write_reg(REG_LED2_PA,0x24))   // Choose value for ~ 7mA for LED2
+  if(!maxim_max30102_write_reg(REG_LED2_PA,0x2f))   // Choose value for ~ 7mA for LED2, change from 0x24 to 0x30, 10mA
     return false;
   if(!maxim_max30102_write_reg(REG_PILOT_PA,0x7f))   // Choose value for ~ 25mA for Pilot LED
     return false;

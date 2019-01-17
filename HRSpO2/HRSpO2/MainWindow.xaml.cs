@@ -1,5 +1,4 @@
-﻿using OxyPlot;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Management;
@@ -14,7 +13,7 @@ namespace HRSpO2
     {
         private Serial.MySerialPort mySerialPort;
 
-        private byte[] loggerBuffer = new byte[10*1024];
+        private byte[] loggerBuffer = new byte[10 * 1024];
         private int loggerBufferWriteIndex = 0;
         private bool loggerBufferOverflow = false;
 
@@ -43,12 +42,12 @@ namespace HRSpO2
             string[] theSerialPortNames = enumerateSerialPorts();
             cbPort.Items.Clear();
 
-            foreach(var pn in theSerialPortNames)
+            foreach (var pn in theSerialPortNames)
             {
                 cbPort.Items.Add(pn);
             }
 
-            if(theSerialPortNames.Length < 1)
+            if (theSerialPortNames.Length < 1)
             {
                 return;
             }
@@ -144,7 +143,7 @@ namespace HRSpO2
         private void UpdateLoggerText()
         {
             string str = null;
-            lock(this)
+            lock (this)
             {
                 var buffer = loggerBuffer;
                 var count = loggerBufferWriteIndex;
@@ -181,7 +180,7 @@ namespace HRSpO2
 
             TbLogger.Text += str;
 
-            TbLogger.CaretIndex = (length+ str.Length);
+            TbLogger.CaretIndex = (length + str.Length);
             TbLogger.ScrollToEnd();
         }
 
@@ -199,7 +198,7 @@ namespace HRSpO2
                 throw new System.Exception("please input valid baud rate");
             }
 
-            if(!int.TryParse(text, out baudRate))
+            if (!int.TryParse(text, out baudRate))
             {
                 throw new System.Exception("baud rate can't convert to int");
             }
@@ -246,6 +245,15 @@ namespace HRSpO2
             }
 
             Data.ViewExt.plotRedIRed(text, this);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (mySerialPort != null)
+            {
+                mySerialPort.Close();
+                mySerialPort = null;
+            }
         }
     }
 }

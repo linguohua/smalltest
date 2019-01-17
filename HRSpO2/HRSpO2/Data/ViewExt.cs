@@ -9,7 +9,7 @@ namespace HRSpO2.Data
         {
             List<DataPoint> reds;
             List<DataPoint> ireds;
-            if (!Data.LogParser.Parse(text, out reds, out ireds))
+            if (!LogParser.Parse(text, out reds, out ireds))
             {
                 return;
             }
@@ -26,8 +26,8 @@ namespace HRSpO2.Data
 
             List<DataPoint> redsMV;
             List<DataPoint> redsMV2;
-            Data.LogParser.MoveAverage(reds, 21, out redsMV);
-            Data.LogParser.MoveAverage(redsMV, 101, out redsMV2);
+            LogParser.MoveAverage(reds, 21, out redsMV);
+            LogParser.MoveAverage(redsMV, 101, out redsMV2);
             var s11 = new OxyPlot.Series.LineSeries();
             s11.Title = "R-MV";
             s11.Points.AddRange(redsMV);
@@ -43,8 +43,8 @@ namespace HRSpO2.Data
             model.Series.Add(s2);
             List<DataPoint> iredsMV;
             List<DataPoint> iredsMV2;
-            Data.LogParser.MoveAverage(ireds, 21, out iredsMV);
-            Data.LogParser.MoveAverage(iredsMV, 101, out iredsMV2);
+            LogParser.MoveAverage(ireds, 21, out iredsMV);
+            LogParser.MoveAverage(iredsMV, 101, out iredsMV2);
             var s21 = new OxyPlot.Series.LineSeries();
             s21.Title = "iR-MV";
             s21.Points.AddRange(iredsMV);
@@ -61,21 +61,23 @@ namespace HRSpO2.Data
             List<DataPoint> osc1;
             List<DataPoint> fft2;
             List<DataPoint> osc2;
-            Data.LogParser.Sub(redsMV, redsMV2, out osc1);
-            Data.LogParser.FFT(osc1, out fft1);
-            Data.LogParser.Sub(iredsMV, iredsMV2, out osc2);
-            Data.LogParser.FFT(osc2, out fft2);
+            LogParser.Sub(redsMV, redsMV2, out osc1);
+            LogParser.FFT(osc1, out fft1);
+            LogParser.Sub(iredsMV, iredsMV2, out osc2);
+            LogParser.FFT(osc2, out fft2);
 
             var fftWnd = new LogPlotWnd();
             fftWnd.MyModel.Title = "fft";
             fftWnd.MyModel.Series.Clear();
             var s3 = new OxyPlot.Series.LineSeries();
-            s3.Title = "red";
+            float freq1 = LogParser.FFTMaxAmplitude(fft1);
+            s3.Title = $"red-{(int)(freq1 * 60)}";
             s3.Points.AddRange(fft1);
             fftWnd.MyModel.Series.Add(s3);
 
             var s4 = new OxyPlot.Series.LineSeries();
-            s4.Title = "ired";
+            float freq2 = LogParser.FFTMaxAmplitude(fft2);
+            s4.Title = $"ired-{(int)(freq2 * 60)}";
             s4.Points.AddRange(fft2);
             fftWnd.MyModel.Series.Add(s4);
 
@@ -84,7 +86,7 @@ namespace HRSpO2.Data
 
             List<DataPoint> dx;
             List<DataPoint> dxBeforeHamming;
-            Data.LogParser.Maxim(ireds, reds, out dx, out dxBeforeHamming);
+            LogParser.Maxim(ireds, reds, out dx, out dxBeforeHamming);
             var maximWnd = new LogPlotWnd();
             maximWnd.MyModel.Title = "maxim";
             maximWnd.MyModel.Series.Clear();
