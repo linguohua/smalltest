@@ -16,7 +16,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -144,6 +144,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="heartbeat32.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HRCLib\HRCLib.vcxproj">
+      <Project>{27714056-5581-4c99-b5e2-85b00106e940}</Project>
+      <Name>HRCLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

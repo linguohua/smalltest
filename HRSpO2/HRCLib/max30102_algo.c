@@ -26,7 +26,7 @@ void maxim_get_an_dx(int32_t* pbuffer, int32_t buff_length)
     }
 
     int32_t idx = 0;
-    for (idx = 0; idx < copy; idx)
+    for (idx = 0; idx < copy; idx++)
     {
         pbuffer[idx] = an_dx[idx];
     }
@@ -41,7 +41,7 @@ void maxim_get_an_dx_before_hamming(int32_t* pbuffer, int32_t buff_length)
     }
 
     int32_t idx = 0;
-    for (idx = 0; idx < copy; idx)
+    for (idx = 0; idx < copy; idx++)
     {
         pbuffer[idx] = an_dx_before_hamming[idx];
     }

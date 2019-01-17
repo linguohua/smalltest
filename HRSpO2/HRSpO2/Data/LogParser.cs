@@ -15,7 +15,7 @@ namespace HRSpO2.Data
             var index = 0;
             using (var ss = new StringReader(text))
             {
-                while(true)
+                while (true)
                 {
                     var line1 = ss.ReadLine();
                     if (line1 == null)
@@ -68,10 +68,10 @@ namespace HRSpO2.Data
 
             const int sampleRate = 100;
 
-            var n = (int)(data.Count/100) * 100;
+            var n = (int)(data.Count / 100) * 100;
             var complex = new Complex[n];
             var used = 0;
-            foreach(var dp in data)
+            foreach (var dp in data)
             {
                 complex[used] = new Complex(dp.Y, 0d);
                 used++;
@@ -86,7 +86,7 @@ namespace HRSpO2.Data
 
             var freq = MathNet.Numerics.IntegralTransforms.Fourier.FrequencyScale(n, sampleRate);
 
-            for (var i = 0; i < n/2; i++)
+            for (var i = 0; i < n / 2; i++)
             {
                 output.Add(new DataPoint(freq[i], complex[i].Magnitude));
             }
@@ -101,7 +101,7 @@ namespace HRSpO2.Data
             int total = data.Count;
             float[] fdata = new float[total];
             var index = 0;
-            foreach(var dp in data)
+            foreach (var dp in data)
             {
                 fdata[index] = (float)dp.Y;
                 index++;
@@ -110,19 +110,19 @@ namespace HRSpO2.Data
             float[] odata = new float[total];
             float sum = 0;
             int windowSizeMax = window;
-            int half = (int)windowSizeMax/2;
+            int half = (int)windowSizeMax / 2;
             int feed = 0;
             int windowSize = 0;
             index = 0;
 
-            for (var i = 0; i < (1+half) && feed < total; i++)
+            for (var i = 0; i < (1 + half) && feed < total; i++)
             {
                 sum += fdata[feed];
                 feed++;
                 windowSize++;
             }
 
-            for (; index < (half) && feed < total; )
+            for (; index < (half) && feed < total;)
             {
                 odata[index] = sum / (float)windowSize;
 
@@ -154,7 +154,7 @@ namespace HRSpO2.Data
             }
 
             index = 0;
-            foreach(var y in odata)
+            foreach (var y in odata)
             {
                 output.Add(new DataPoint(index, y));
                 index++;
@@ -167,10 +167,60 @@ namespace HRSpO2.Data
 
             var src2Array = src2.ToArray();
             var i = 0;
-            foreach(var dp in src1)
+            foreach (var dp in src1)
             {
                 output.Add(new DataPoint(dp.X, (dp.Y - src2Array[i].Y)));
                 i++;
+            }
+        }
+
+        public static void Maxim(List<DataPoint> ireds, List<DataPoint> reds, out List<DataPoint> dx, out List<DataPoint> dxBeforeHamming)
+        {
+            dx = new List<DataPoint>();
+            dxBeforeHamming = new List<DataPoint>();
+
+            int supportedLength = HRCLib.HRCLib.BufferSizeSupported();
+            var redsArray = new int[supportedLength];
+            var iredsArray = new int[supportedLength];
+
+            var i = 0;
+            foreach (var dp in reds)
+            {
+                redsArray[i] = (int)dp.Y;
+                i++;
+
+                if (i == supportedLength)
+                {
+                    break;
+                }
+            }
+
+            i = 0;
+            foreach (var dp in ireds)
+            {
+                iredsArray[i] = (int)dp.Y;
+                i++;
+
+                if (i == supportedLength)
+                {
+                    break;
+                }
+            }
+
+            HRCLib.HRCLib.HRCalc(iredsArray, redsArray);
+            var dxArray = new int[supportedLength];
+            HRCLib.HRCLib.GetDx(dxArray);
+            i = 0;
+            foreach (var d in dxArray)
+            {
+                dx.Add(new DataPoint(i++, d));
+            }
+
+            HRCLib.HRCLib.GetDxBeforeHamming(dxArray);
+            i = 0;
+            foreach (var d in dxArray)
+            {
+                dxBeforeHamming.Add(new DataPoint(i++, d));
             }
         }
     }

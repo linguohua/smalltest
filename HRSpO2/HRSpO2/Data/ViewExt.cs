@@ -81,6 +81,25 @@ namespace HRSpO2.Data
 
             fftWnd.Owner = owner;
             fftWnd.Show();
+
+            List<DataPoint> dx;
+            List<DataPoint> dxBeforeHamming;
+            Data.LogParser.Maxim(ireds, reds, out dx, out dxBeforeHamming);
+            var maximWnd = new LogPlotWnd();
+            maximWnd.MyModel.Title = "maxim";
+            maximWnd.MyModel.Series.Clear();
+            var s5 = new OxyPlot.Series.LineSeries();
+            int hr = HRCLib.HRCLib.GetHeartRate();
+            s5.Title = $"dx-{hr}";
+            s5.Points.AddRange(dx);
+            maximWnd.MyModel.Series.Add(s5);
+
+            var s6 = new OxyPlot.Series.LineSeries();
+            s6.Title = "dx-b-hamming";
+            s6.Points.AddRange(dxBeforeHamming);
+            maximWnd.MyModel.Series.Add(s6);
+            maximWnd.Owner = owner;
+            maximWnd.Show();
         }
     }
 }
