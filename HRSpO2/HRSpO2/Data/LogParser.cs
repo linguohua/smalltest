@@ -240,5 +240,36 @@ namespace HRSpO2.Data
                 dxBeforeHamming.Add(new DataPoint(i++, d));
             }
         }
+
+        public static void FindPositivePeak(List<DataPoint> dcac, List<DataPoint> dc, out List<int> peakLocs)
+        {
+            int length = dcac.Count;
+            var dcacArray = dcac.ToArray();
+            var dcArray = dc.ToArray();
+
+            peakLocs = new List<int>();
+
+            for (var i = 1; i < dcacArray.Length-1; i++)
+            {
+                var p0 = dcacArray[i-1];
+                var p1 = dcacArray[i];
+                var p2 = dcacArray[i + 1];
+
+                if (p1.Y > dc[i].Y)
+                {
+                    if (p1.Y > p0.Y && p1.Y > p2.Y)
+                    {
+                        peakLocs.Add(i);
+                    }
+                }
+            }
+        }
+
+        //public static bool Spo2Calc(List<DataPoint> redsAC, List<DataPoint> redsDC, 
+        //    List<DataPoint> iredsAC, List<DataPoint> iredsDC)
+        //{
+
+        //    return false;
+        //}
     }
 }

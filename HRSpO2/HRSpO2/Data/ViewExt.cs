@@ -1,5 +1,7 @@
 ﻿using OxyPlot;
 using System.Collections.Generic;
+using System;
+using System.Numerics;
 
 namespace HRSpO2.Data
 {
@@ -36,6 +38,10 @@ namespace HRSpO2.Data
             s12.Title = "R-MV2";
             s12.Points.AddRange(redsMV2);
             model.Series.Add(s12);
+
+            AddPeak2Serials(redsMV, redsMV2, model, "R-MV-P");
+
+            PlotRedAC(redsMV, redsMV2, owner);
 
             var s2 = new OxyPlot.Series.LineSeries();
             s2.Title = "IR";
@@ -102,6 +108,120 @@ namespace HRSpO2.Data
             maximWnd.MyModel.Series.Add(s6);
             maximWnd.Owner = owner;
             maximWnd.Show();
+        }
+
+        private static void PlotRedAC(List<DataPoint> redsMV, List<DataPoint> redsMV2, System.Windows.Window owner)
+        {
+            List<DataPoint> osc1;
+            LogParser.Sub(redsMV, redsMV2, out osc1);
+
+            //const int sampleRate = 100;
+
+            var n = (int)(osc1.Count / 100) * 100;
+            var complex = new Complex[n];
+            var used = 0;
+            foreach (var dp in osc1)
+            {
+                complex[used] = new Complex(dp.Y, 0d);
+                used++;
+
+                if (used == n)
+                {
+                    break;
+                }
+            }
+
+            MathNet.Numerics.IntegralTransforms.Fourier.Forward(complex);
+
+            // reset others to 0
+            float maxAmplitude = 0;
+            int index = -1;
+            var i = 0;
+            foreach(var c in complex)
+            {
+                float m = (float)c.Magnitude;
+                if (m > maxAmplitude)
+                {
+                    maxAmplitude = m;
+                    index = i;
+                }
+
+                i++;
+
+                // only half search
+                if (i > complex.Length/2)
+                {
+                    break;
+                }
+            }
+            // reset others to 0
+            for ( i = 0; i < complex.Length; i++)
+            {
+                if (i != index && (i != (complex.Length - index)))
+                {
+                    complex[i] = new Complex();
+                }
+            }
+
+            List<DataPoint> fft1 = new List<DataPoint>();
+            i = 0;
+            foreach(var c in complex)
+            {
+                fft1.Add(new DataPoint(i++, c.Magnitude/complex.Length));
+            }
+
+            //for (var i = 0; i < n / 2; i++)
+            //{
+            //    //
+            //}
+            var fftWnd = new LogPlotWnd();
+            fftWnd.MyModel.Title = "osc";
+            fftWnd.MyModel.Series.Clear();
+            var s3 = new OxyPlot.Series.LineSeries();
+            s3.Title = $"fft";
+            s3.Points.AddRange(fft1);
+            fftWnd.MyModel.Series.Add(s3);
+            
+            var s4 = new OxyPlot.Series.LineSeries();
+            s4.Title = "osc";
+            s4.Points.AddRange(osc1);
+            fftWnd.MyModel.Series.Add(s4);
+            fftWnd.Owner = owner;
+            fftWnd.Show();
+        }
+
+        private static void AddPeak2Serials(List<DataPoint> redsMV, List<DataPoint> redsMV2, PlotModel model, string name)
+        {
+            List<int> peakLocs;
+            LogParser.FindPositivePeak(redsMV, redsMV2, out peakLocs);
+
+            if (peakLocs.Count < 3)
+            {
+                return;
+            }
+
+            List<DataPoint> peaks = new List<DataPoint>();
+            foreach(var ploc in peakLocs)
+            {
+                peaks.Add(new DataPoint(ploc, redsMV[ploc].Y));
+            }
+
+            int totalIntervals = 0;
+            for(var i = 0; i < peakLocs.Count - 1; i++)
+            {
+                totalIntervals += (peakLocs[i + 1] - peakLocs[i]);
+            }
+
+            float averageIntervals = (float)totalIntervals / (peakLocs.Count - 1);
+            int hr = (int)(100 * 60 / averageIntervals);
+            var s1 = new OxyPlot.Series.LineSeries();
+            s1.Title = name+$"-{hr}";
+            s1.Points.AddRange(peaks);
+            s1.MarkerType = MarkerType.Triangle;
+            s1.MarkerSize = 5;
+            s1.LineStyle = LineStyle.None;
+
+            model.Series.Add(s1);
         }
     }
 }
