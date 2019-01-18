@@ -170,6 +170,15 @@ namespace HRSpO2.Data
                 fft1.Add(new DataPoint(i++, c.Magnitude/complex.Length));
             }
 
+
+            // inverse
+            List<DataPoint> osc2 = new List<DataPoint>();
+            MathNet.Numerics.IntegralTransforms.Fourier.Inverse(complex);
+            for(i = 0; i < complex.Length; i++)
+            {
+                osc2.Add(new DataPoint(i, complex[i].Real));
+            }
+
             //for (var i = 0; i < n / 2; i++)
             //{
             //    //
@@ -186,6 +195,12 @@ namespace HRSpO2.Data
             s4.Title = "osc";
             s4.Points.AddRange(osc1);
             fftWnd.MyModel.Series.Add(s4);
+
+            var s5 = new OxyPlot.Series.LineSeries();
+            s5.Title = "inverse";
+            s5.Points.AddRange(osc2);
+            fftWnd.MyModel.Series.Add(s5);
+
             fftWnd.Owner = owner;
             fftWnd.Show();
         }
