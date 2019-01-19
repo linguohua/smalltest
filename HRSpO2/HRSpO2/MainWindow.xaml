@@ -59,6 +59,7 @@
         </StackPanel>
         <DockPanel Grid.Column="2" LastChildFill="True">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Margin="5,2,5,2" HorizontalAlignment="Right">
+                <TextBlock x:Name="txtCount" Margin="0,0,100,0"></TextBlock>             
                 <Button Content="Clear" Click="Button_Clear_Click" Margin="0,0,10,0"></Button>
                 <Button Content="Plot" Click="Button_Plot_Click"></Button>
             </StackPanel>

@@ -7,10 +7,13 @@ namespace HRSpO2.Data
 {
     class LogParser
     {
-        public static bool Parse(string text, out List<DataPoint> reds, out List<DataPoint> ireds)
+        public static bool Parse(string text, HRContext ctx)
         {
-            reds = new List<DataPoint>();
-            ireds = new List<DataPoint>();
+            var reds = new List<DataPoint>();
+            var ireds = new List<DataPoint>();
+
+            ctx.redsRaw = reds;
+            ctx.iredsRaw = ireds;
 
             var index = 0;
             using (var ss = new StringReader(text))
@@ -241,21 +244,20 @@ namespace HRSpO2.Data
             }
         }
 
-        public static void FindPositivePeak(List<DataPoint> dcac, List<DataPoint> dc, out List<int> peakLocs)
+        public static void FindPositivePeak(List<DataPoint> osc, out List<int> peakLocs)
         {
-            int length = dcac.Count;
-            var dcacArray = dcac.ToArray();
-            var dcArray = dc.ToArray();
+            int length = osc.Count;
+            var oscArray = osc.ToArray();
 
             peakLocs = new List<int>();
 
-            for (var i = 1; i < dcacArray.Length-1; i++)
+            for (var i = 1; i < oscArray.Length-1; i++)
             {
-                var p0 = dcacArray[i-1];
-                var p1 = dcacArray[i];
-                var p2 = dcacArray[i + 1];
+                var p0 = oscArray[i-1];
+                var p1 = oscArray[i];
+                var p2 = oscArray[i + 1];
 
-                if (p1.Y > dc[i].Y)
+                if (p1.Y > 0)
                 {
                     if (p1.Y > p0.Y && p1.Y > p2.Y)
                     {
@@ -265,11 +267,49 @@ namespace HRSpO2.Data
             }
         }
 
-        //public static bool Spo2Calc(List<DataPoint> redsAC, List<DataPoint> redsDC, 
-        //    List<DataPoint> iredsAC, List<DataPoint> iredsDC)
-        //{
+        public static float Spo2Calc(HRContext ctx)
+        {
+            List<int> redPeakLocs;
+            List<int> iredPeakLocs;
 
-        //    return false;
-        //}
+            FindPositivePeak(ctx.redsOSC, out redPeakLocs);
+            FindPositivePeak(ctx.iredsOSC, out iredPeakLocs);
+
+            List<float> redACDC = new List<float>();
+            foreach(var rpl in redPeakLocs)
+            {
+                var redAC = ctx.redsMV1[rpl].Y;
+                var redDC = ctx.redsMV2[rpl].Y;
+
+                var ratio = redAC / redDC;
+                redACDC.Add((float)ratio);
+            }
+
+            List<float> iredACDC = new List<float>();
+            foreach (var irpl in iredPeakLocs)
+            {
+                var iredAC = ctx.redsMV1[irpl].Y;
+                var iredDC = ctx.redsMV2[irpl].Y;
+
+                var ratio = iredAC / iredDC;
+                iredACDC.Add((float)ratio);
+            }
+
+            float ratioFinal = Average(redACDC) / Average(iredACDC);
+
+            double spO2 =  -45.060* ratioFinal * ratioFinal + 30.354 * ratioFinal + 94.845 ;  // for comparison with table
+            return (float)spO2;
+        }
+
+        private static float Average(List<float> series)
+        {
+            float sum = 0;
+            foreach(var v in series)
+            {
+                sum += v;
+            }
+
+            return sum / (float)series.Count;
+        }
     }
 }

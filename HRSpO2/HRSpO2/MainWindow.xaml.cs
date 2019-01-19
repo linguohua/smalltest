@@ -16,7 +16,7 @@ namespace HRSpO2
         private byte[] loggerBuffer = new byte[10 * 1024];
         private int loggerBufferWriteIndex = 0;
         private bool loggerBufferOverflow = false;
-
+        private int currentLineCount = 0;
 
         private System.Windows.Threading.DispatcherTimer dispatcherTimer;
 
@@ -182,6 +182,25 @@ namespace HRSpO2
 
             TbLogger.CaretIndex = (length + str.Length);
             TbLogger.ScrollToEnd();
+
+            var lineCount = CountLine(str);
+            currentLineCount += lineCount;
+            txtCount.Text = $"{currentLineCount}";
+        }
+
+        private int CountLine(string str)
+        {
+            int countLine = 0;
+
+            foreach (var c in str)
+            {
+                if (c == '\n')
+                {
+                    countLine++;
+                }
+            }
+
+            return countLine;
         }
 
         private Serial.SerialPortCfg CollectPortCfg()
@@ -234,6 +253,9 @@ namespace HRSpO2
         private void Button_Clear_Click(object sender, RoutedEventArgs e)
         {
             TbLogger.Text = "";
+
+            currentLineCount = 0;
+            txtCount.Text = $"{currentLineCount}";
         }
 
         private void Button_Plot_Click(object sender, RoutedEventArgs e)
