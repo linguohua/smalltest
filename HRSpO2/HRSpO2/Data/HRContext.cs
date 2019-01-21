@@ -27,14 +27,17 @@ namespace HRSpO2.Data
 
         public float SpO2;
         public int HeartRate;
+        public float R;
 
         public void Refine()
         {
-            LogParser.MoveAverage(redsRaw, 21, out redsMV1);
-            LogParser.MoveAverage(redsMV1, 101, out redsMV2);
+            const int acMVWindow = 11;
+            const int dcMVWindow = 101;
+            LogParser.MoveAverage(redsRaw, acMVWindow, out redsMV1);
+            LogParser.MoveAverage(redsMV1, dcMVWindow, out redsMV2);
 
-            LogParser.MoveAverage(this.iredsRaw, 21, out iredsMV1);
-            LogParser.MoveAverage(iredsMV1, 101, out iredsMV2);
+            LogParser.MoveAverage(this.iredsRaw, acMVWindow, out iredsMV1);
+            LogParser.MoveAverage(iredsMV1, dcMVWindow, out iredsMV2);
 
             LogParser.Sub(redsMV1, redsMV2, out redsOSC);
             LogParser.Sub(iredsMV1, iredsMV2, out iredsOSC);
@@ -44,7 +47,7 @@ namespace HRSpO2.Data
             redsIFFTOSC = FFTFilter(redsOSC, out freq1);
             iredsIFFTOSC = FFTFilter(iredsOSC, out freq2);
 
-            SpO2 = LogParser.Spo2Calc(this);
+            SpO2 = LogParser.Spo2Calc(this, out R);
 
             HeartRate = (int)(freq1 * 60);
         }

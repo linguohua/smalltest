@@ -79,7 +79,8 @@ namespace HRSpO2.Data
             model.Series.Add(s2);
 
             var s21 = new OxyPlot.Series.LineSeries();
-            s21.Title = "iR-MV";
+            var r = ctx.R.ToString("0.00");
+            s21.Title = $"iR-MV:{r}";
             s21.Points.AddRange(ctx.iredsMV1);
             model.Series.Add(s21);
             var s22 = new OxyPlot.Series.LineSeries();

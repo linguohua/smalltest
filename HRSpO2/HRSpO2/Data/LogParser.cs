@@ -267,18 +267,18 @@ namespace HRSpO2.Data
             }
         }
 
-        public static float Spo2Calc(HRContext ctx)
+        public static float Spo2Calc(HRContext ctx, out float r)
         {
             List<int> redPeakLocs;
             List<int> iredPeakLocs;
 
-            FindPositivePeak(ctx.redsOSC, out redPeakLocs);
-            FindPositivePeak(ctx.iredsOSC, out iredPeakLocs);
+            FindPositivePeak(ctx.redsIFFTOSC, out redPeakLocs);
+            FindPositivePeak(ctx.iredsIFFTOSC, out iredPeakLocs);
 
             List<float> redACDC = new List<float>();
             foreach(var rpl in redPeakLocs)
             {
-                var redAC = ctx.redsMV1[rpl].Y;
+                var redAC = ctx.redsIFFTOSC[rpl].Y;
                 var redDC = ctx.redsMV2[rpl].Y;
 
                 var ratio = redAC / redDC;
@@ -288,16 +288,29 @@ namespace HRSpO2.Data
             List<float> iredACDC = new List<float>();
             foreach (var irpl in iredPeakLocs)
             {
-                var iredAC = ctx.redsMV1[irpl].Y;
-                var iredDC = ctx.redsMV2[irpl].Y;
+                var iredAC = ctx.iredsIFFTOSC[irpl].Y;
+                var iredDC = ctx.iredsMV2[irpl].Y;
 
                 var ratio = iredAC / iredDC;
                 iredACDC.Add((float)ratio);
             }
 
-            float ratioFinal = Average(redACDC) / Average(iredACDC);
+            List<float> ratios = new List<float>();
+            var i = 0;
+            foreach(var rr in redACDC)
+            {
+                ratios.Add( rr / iredACDC[i++]);
 
+                if (i >= iredACDC.Count)
+                {
+                    break;
+                }
+            }
+
+            var ratioFinal = Average(ratios);
+            r = ratioFinal;
             double spO2 =  -45.060* ratioFinal * ratioFinal + 30.354 * ratioFinal + 94.845 ;  // for comparison with table
+
             return (float)spO2;
         }
 

@@ -76,7 +76,7 @@ bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
   ach_i2c_data[0]=uch_addr;
   ach_i2c_data[1]=uch_data;
 
-  if(i2c_write(I2C_WRITE_ADDR, ach_i2c_data, 2, false)==0)
+  if(i2c_write(I2C_WRITE_ADDR, ach_i2c_data, 2, true)==0)
     return true;
   else
     return false;
@@ -118,30 +118,71 @@ bool maxim_max30102_init()
 * \retval       true on success
 */
 {
-  if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0xc0)) // INTR setting
+//  uint8_t temp = 0xcc;
+  if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0x40)) // INTR setting, 0xc0
     return false;
+
+//  if (!maxim_max30102_read_reg(REG_INTR_ENABLE_1, &temp))
+//    return false;
+//
+//  if (temp != 0x40)
+//    return false;
 
   if(!maxim_max30102_write_reg(REG_INTR_ENABLE_2,0x00))
     return false;
+
+//  if (!maxim_max30102_read_reg(REG_INTR_ENABLE_2, &temp))
+//    return false;
+//
+//  if (temp != 0x00)
+//    return false;
+
   if(!maxim_max30102_write_reg(REG_FIFO_WR_PTR,0x00))  //FIFO_WR_PTR[4:0]
     return false;
   if(!maxim_max30102_write_reg(REG_OVF_COUNTER,0x00))  //OVF_COUNTER[4:0]
     return false;
   if(!maxim_max30102_write_reg(REG_FIFO_RD_PTR,0x00))  //FIFO_RD_PTR[4:0]
     return false;
-  if(!maxim_max30102_write_reg(REG_FIFO_CONFIG,0x0f))  //sample avg = 1, fifo rollover=false, fifo almost full = 17
+  if(!maxim_max30102_write_reg(REG_FIFO_CONFIG,0x1f))  //sample avg = 1, fifo rollover=false, fifo almost full = 17, 0x0f
     return false;
+
+//  if (!maxim_max30102_read_reg(REG_FIFO_CONFIG, &temp))
+//    return false;
+//
+//  if (temp != 0x1f)
+//    return false;
+
   if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x03))   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
     return false;
+
+//  if (!maxim_max30102_read_reg(REG_MODE_CONFIG, &temp))
+//    return false;
+//
+//  if (temp != 0x03)
+//    return false;
+
   if(!maxim_max30102_write_reg(REG_SPO2_CONFIG,0x27))  // SPO2_ADC range = 4096nA, SPO2 sample rate (100 Hz), LED pulseWidth (400uS)
     return false;
 
-  if(!maxim_max30102_write_reg(REG_LED1_PA,0x24))   //Choose value for ~ 7mA for LED1
+//  if (!maxim_max30102_read_reg(REG_SPO2_CONFIG, &temp))
+//    return false;
+//
+//  if (temp != 0x27)
+//    return false;
+
+  if(!maxim_max30102_write_reg(REG_LED1_PA,0x24))   //Choose value for ~ 7mA for LED1, RED
     return false;
-  if(!maxim_max30102_write_reg(REG_LED2_PA,0x2f))   // Choose value for ~ 7mA for LED2, change from 0x24 to 0x30, 10mA
+  if(!maxim_max30102_write_reg(REG_LED2_PA,0x24))   // Choose value for ~ 7mA for LED2, IR, change from 0x24 to 0x30, 10mA
     return false;
-  if(!maxim_max30102_write_reg(REG_PILOT_PA,0x7f))   // Choose value for ~ 25mA for Pilot LED
-    return false;
+//  if(!maxim_max30102_write_reg(REG_PILOT_PA,0x7f))   // Choose value for ~ 25mA for Pilot LED
+//    return false;
+
+//  if (!maxim_max30102_read_reg(REG_PILOT_PA, &temp))
+//    return false;
+//
+//  if (temp != 0x7f)
+//    return false;
+
   return true;
 }
 

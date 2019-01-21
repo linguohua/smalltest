@@ -1025,58 +1025,58 @@ static void test_hr()
     while(1)
     {
         i=0;
-        un_min=0x3FFFF;
-        un_max=0;
-
-        NRF_LOG_INFO("red=");
-        NRF_LOG_INFO("%i", aun_red_buffer[i]);
-        NRF_LOG_INFO(", ir=");
-        NRF_LOG_INFO("%i", aun_ir_buffer[i]);
-        NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
-        NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
-        NRF_LOG_INFO("SpO2=%f, ", n_sp02);
-        NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
-
-        NRF_LOG_FLUSH();
-
-        //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
-        for(i=100;i<500;i++)
-        {
-            aun_red_buffer[i-100]=aun_red_buffer[i];
-            aun_ir_buffer[i-100]=aun_ir_buffer[i];
-
-            //update the signal min and max
-            if(un_min>aun_red_buffer[i])
-            un_min=aun_red_buffer[i];
-            if(un_max<aun_red_buffer[i])
-            un_max=aun_red_buffer[i];
-        }
+//        un_min=0x3FFFF;
+//        un_max=0;
+//
+//        NRF_LOG_INFO("red=");
+//        NRF_LOG_INFO("%i", aun_red_buffer[i]);
+//        NRF_LOG_INFO(", ir=");
+//        NRF_LOG_INFO("%i", aun_ir_buffer[i]);
+//        NRF_LOG_INFO(", HR=%i, ", n_heart_rate);
+//        NRF_LOG_INFO("HRvalid=%i, ", ch_hr_valid);
+//        NRF_LOG_INFO("SpO2=%f, ", n_sp02);
+//        NRF_LOG_INFO("SPO2Valid=%i\n\r", ch_spo2_valid);
+//
+//        NRF_LOG_FLUSH();
+//
+//        //dumping the first 100 sets of samples in the memory and shift the last 400 sets of samples to the top
+//        for(i=100;i<500;i++)
+//        {
+//            aun_red_buffer[i-100]=aun_red_buffer[i];
+//            aun_ir_buffer[i-100]=aun_ir_buffer[i];
+//
+//            //update the signal min and max
+//            if(un_min>aun_red_buffer[i])
+//            un_min=aun_red_buffer[i];
+//            if(un_max<aun_red_buffer[i])
+//            un_max=aun_red_buffer[i];
+//        }
 
         //take 100 sets of samples before calculating the heart rate.
-        for(i=400;i<500;i++)
-        {
-            un_prev_data=aun_red_buffer[i-1];
+//        for(i=400;i<500;i++)
+//        {
+//            un_prev_data=aun_red_buffer[i-1];
             while(!maxim_max30102_data_ready());   //wait until the interrupt pin asserts
             maxim_max30102_read_fifo((aun_red_buffer+i), (aun_ir_buffer+i));
 
-            if(aun_red_buffer[i]>un_prev_data)//just to determine the brightness of LED according to the deviation of adjacent two AD data
-            {
-                f_temp=aun_red_buffer[i]-un_prev_data;
-                f_temp/=(un_max-un_min);
-                f_temp*=MAX_BRIGHTNESS;
-                n_brightness-=(int)f_temp;
-                if(n_brightness<0)
-                    n_brightness=0;
-            }
-            else
-            {
-                f_temp=un_prev_data-aun_red_buffer[i];
-                f_temp/=(un_max-un_min);
-                f_temp*=MAX_BRIGHTNESS;
-                n_brightness+=(int)f_temp;
-                if(n_brightness>MAX_BRIGHTNESS)
-                    n_brightness=MAX_BRIGHTNESS;
-            }
+//            if(aun_red_buffer[i]>un_prev_data)//just to determine the brightness of LED according to the deviation of adjacent two AD data
+//            {
+//                f_temp=aun_red_buffer[i]-un_prev_data;
+//                f_temp/=(un_max-un_min);
+//                f_temp*=MAX_BRIGHTNESS;
+//                n_brightness-=(int)f_temp;
+//                if(n_brightness<0)
+//                    n_brightness=0;
+//            }
+//            else
+//            {
+//                f_temp=un_prev_data-aun_red_buffer[i];
+//                f_temp/=(un_max-un_min);
+//                f_temp*=MAX_BRIGHTNESS;
+//                n_brightness+=(int)f_temp;
+//                if(n_brightness>MAX_BRIGHTNESS)
+//                    n_brightness=MAX_BRIGHTNESS;
+//            }
 
 //            pwmled.write(1-(float)n_brightness/256);//pwm control led brightness
 //                        if(n_brightness<120)
@@ -1096,10 +1096,10 @@ static void test_hr()
             myuart_printf("r:%i\r\n", aun_red_buffer[i]);
             myuart_printf("ir:%i\r\n", aun_ir_buffer[i]);
 
-        }
+//        }
 //        maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
-    rf_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid,
-        &ratio, &correl);
+//    rf_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid,
+//        &ratio, &correl);
     }
 }
 
