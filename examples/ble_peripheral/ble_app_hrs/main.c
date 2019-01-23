@@ -208,7 +208,8 @@ void advertising_start(bool erase_bonds)
     {
         ret_code_t err_code;
 
-        err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+        // use slow mode
+        err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_SLOW );
         APP_ERROR_CHECK(err_code);
     }
 }
@@ -685,7 +686,11 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
             APP_ERROR_CHECK(err_code);
             break;
-
+        case BLE_ADV_EVT_SLOW:
+            NRF_LOG_INFO("Slow advertising.");
+            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
+            APP_ERROR_CHECK(err_code);
+            break;
         case BLE_ADV_EVT_IDLE:
             NRF_LOG_INFO("BLE_ADV_EVT_IDLE.");
             //sleep_mode_enter();
@@ -906,6 +911,11 @@ static void advertising_init(void)
     init.config.ble_adv_fast_enabled  = true;
     init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;
     init.config.ble_adv_fast_timeout  = APP_ADV_DURATION;
+
+    // enable slow mode
+    init.config.ble_adv_slow_enabled  = true;
+    init.config.ble_adv_slow_interval = APP_ADV_INTERVAL;
+    init.config.ble_adv_slow_timeout  = APP_ADV_DURATION;
 
     init.evt_handler = on_adv_evt;
 
