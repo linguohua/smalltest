@@ -119,7 +119,7 @@ bool maxim_max30102_init()
 */
 {
 //  uint8_t temp = 0xcc;
-  if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0x40)) // INTR setting, 0xc0
+  if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0xc0)) // INTR setting, 0xc0
     return false;
 
 //  if (!maxim_max30102_read_reg(REG_INTR_ENABLE_1, &temp))
@@ -251,6 +251,23 @@ bool maxim_max30102_reset()
 */
 {
     if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x40))
+        return false;
+    else
+        return true;
+}
+
+bool maxim_max30102_shutdown()
+/**
+* \brief        Reset the MAX30102
+* \par          Details
+*               This function resets the MAX30102
+*
+* \param        None
+*
+* \retval       true on success
+*/
+{
+    if(!maxim_max30102_write_reg(REG_MODE_CONFIG,0x80))
         return false;
     else
         return true;

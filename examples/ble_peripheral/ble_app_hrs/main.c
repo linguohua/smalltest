@@ -720,12 +720,18 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
             APP_ERROR_CHECK(err_code);
+
+            // start sensor
+            max30102_sensor_start();
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected, reason %d.",
                           p_ble_evt->evt.gap_evt.params.disconnected.reason);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
+
+            // stop sensor
+            max30102_sensor_stop();
             break;
 
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
@@ -1108,7 +1114,7 @@ int main(void)
     buttons_leds_init(&erase_bonds);
 
     voice_init();
-    myuart_init(true);
+    myuart_init(false);
 
     power_management_init();
 
@@ -1122,32 +1128,34 @@ int main(void)
     conn_params_init();
     peer_manager_init();
 
-    if (maxim_twi_init() != 0)
-    {
-        NRF_LOG_INFO("twi init failed.");
-        APP_ERROR_CHECK_BOOL(false);
-    }
+    max30102_sensor_init();
 
-    if (!maxim_max30102_reset())
-    {
-        NRF_LOG_INFO("maxim_max30102_reset failed.");
-        APP_ERROR_CHECK_BOOL(false);
-    }
+//    if (maxim_twi_init() != 0)
+//    {
+//        NRF_LOG_INFO("twi init failed.");
+//        APP_ERROR_CHECK_BOOL(false);
+//    }
+
+//    if (!maxim_max30102_reset())
+//    {
+//        NRF_LOG_INFO("maxim_max30102_reset failed.");
+//        APP_ERROR_CHECK_BOOL(false);
+//    }
 
     //read and clear status register
-    uint8_t uch_dummy;
-    maxim_max30102_read_reg(0,&uch_dummy);
-    maxim_max30102_read_reg(1,&uch_dummy);
+//    uint8_t uch_dummy;
+//    maxim_max30102_read_reg(0,&uch_dummy);
+//    maxim_max30102_read_reg(1,&uch_dummy);
+//
+//    if (!maxim_max30102_init())
+//    {
+//        NRF_LOG_INFO("maxim_max30102_init failed.");
+//        APP_ERROR_CHECK_BOOL(false);
+//    }
 
-    if (!maxim_max30102_init())
-    {
-        NRF_LOG_INFO("maxim_max30102_init failed.");
-        APP_ERROR_CHECK_BOOL(false);
-    }
 
-
-    nrf_delay_ms(1000);
-   //  test_hr();
+    //nrf_delay_ms(1000);
+    //test_hr();
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
