@@ -15,7 +15,7 @@ extern "C" {
 #define RTC1_TICKS_PER_SECOND 32768 //
 #define RTC1_TICKS_PER_MS ((int)(RTC1_TICKS_PER_SECOND/1000)) //
 
-#define FIFO_READ_PERIOD_MS 5 //
+#define FIFO_READ_PERIOD_MS 50 //
 #define FIFO_READ_PERIOD_TICKS (RTC1_TICKS_PER_MS*FIFO_READ_PERIOD_MS) //
 
 void feed_red_ired(float red, float ired);

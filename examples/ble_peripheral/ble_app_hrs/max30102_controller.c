@@ -159,12 +159,34 @@ static void fifo_read_timeout_handler(void * p_context)
         return;
     }
 
-    maxim_max30102_read_fifo(&red, &ired);
+    // read write ptr, and read ptr
+    // calc number to read
+    uint8_t shouldRead = 0;
+    uint8_t readPtr = 0;
+    uint8_t writePtr = 0;
+    uint8_t read = 0;
 
-    feed_red_ired(red, ired);
+    maxim_max30102_read_reg(REG_FIFO_RD_PTR, &readPtr);
+    maxim_max30102_read_reg(REG_FIFO_WR_PTR, &writePtr);
 
-    myuart_printf("r:%i\r\n", red);
-    myuart_printf("ir:%i\r\n", ired);
+    if (writePtr < readPtr)
+    {
+        writePtr += 34;
+    }
+
+    shouldRead = writePtr - readPtr;
+
+    while (read < shouldRead)
+    {
+        maxim_max30102_read_fifo(&red, &ired);
+
+        feed_red_ired(red, ired);
+
+        myuart_printf("r:%i\r\n", red);
+        myuart_printf("ir:%i\r\n", ired);
+
+        read++;
+    }
 
     // re-start timer
     err_code = app_timer_start(m_fifo_read_timer_id, FIFO_READ_PERIOD_TICKS, NULL);
