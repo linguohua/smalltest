@@ -12,6 +12,8 @@ extern "C" {
 #define MAX30102_SDA_PIN 4
 #define MAX30102_SCL_PIN 5
 
+#define FIFO_BUFFER_DEPTH 32
+
 #define I2C_WRITE_ADDR 0x57 // 0xAE
 #define I2C_READ_ADDR 0x57 // 0xAF
 
@@ -43,7 +45,7 @@ uint32_t maxim_twi_init(void);
 
 bool maxim_max30102_data_ready();
 bool maxim_max30102_init();
-bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led);
+bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led, uint32_t toRead);
 bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
 bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data);
 bool maxim_max30102_reset(void);

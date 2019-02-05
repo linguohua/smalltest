@@ -141,6 +141,7 @@ void max30102_sensor_stop(void)
     }
 }
 
+static uint32_t red[FIFO_BUFFER_DEPTH], ired[FIFO_BUFFER_DEPTH];
 static void fifo_read_timeout_handler(void * p_context)
 {
     if (!is_activated)
@@ -148,7 +149,7 @@ static void fifo_read_timeout_handler(void * p_context)
         return;
     }
 
-    uint32_t red, ired;
+    
     ret_code_t      err_code;
 
     if (!maxim_max30102_data_ready())   //wait until the interrupt pin asserts
@@ -156,6 +157,7 @@ static void fifo_read_timeout_handler(void * p_context)
         err_code = app_timer_start(m_fifo_read_timer_id, FIFO_READ_PERIOD_TICKS, NULL);
         APP_ERROR_CHECK(err_code);
 
+        myuart_printf("!\r\n");
         return;
     }
 
@@ -169,22 +171,30 @@ static void fifo_read_timeout_handler(void * p_context)
     maxim_max30102_read_reg(REG_FIFO_RD_PTR, &readPtr);
     maxim_max30102_read_reg(REG_FIFO_WR_PTR, &writePtr);
 
-    if (writePtr < readPtr)
+    readPtr = readPtr & 0x1f;
+    writePtr = writePtr & 0x1f;
+
+    if (writePtr <= readPtr)
     {
-        writePtr += 34;
+        // FIFO buffer depth is 32
+        writePtr += FIFO_BUFFER_DEPTH;
+        //myuart_printf("w:%i\r\n", (int)(writePtr-readPtr));
     }
 
     shouldRead = writePtr - readPtr;
+    read = 0;
+    myuart_printf("w:%i\r\n", (int)(shouldRead));
 
-    while (read < shouldRead)
+    if(!maxim_max30102_read_fifo(red, ired, shouldRead))
     {
-        maxim_max30102_read_fifo(&red, &ired);
+        APP_ERROR_CHECK_BOOL(false);
+    }
 
-        feed_red_ired(red, ired);
-
-        myuart_printf("r:%i\r\n", red);
-        myuart_printf("ir:%i\r\n", ired);
-
+    // feed_red_ired(red, ired);
+    while(read < shouldRead)
+    {
+        myuart_printf("r:%i\r\n", red[read]);
+        myuart_printf("ir:%i\r\n", ired[read]);
         read++;
     }
 

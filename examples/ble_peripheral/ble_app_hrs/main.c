@@ -989,6 +989,76 @@ static void idle_state_handle(void)
     }
 }
 
+void testHR()
+{
+    uint32_t red[FIFO_BUFFER_DEPTH], ired[FIFO_BUFFER_DEPTH];
+    ret_code_t      err_code;
+
+    if (!maxim_max30102_reset())
+    {
+        NRF_LOG_INFO("maxim_max30102_reset failed.");
+        APP_ERROR_CHECK_BOOL(false);
+    }
+
+    //read and clear status register
+    uint8_t uch_dummy;
+    maxim_max30102_read_reg(0,&uch_dummy);
+    maxim_max30102_read_reg(1,&uch_dummy);
+
+    if (!maxim_max30102_init())
+    {
+        NRF_LOG_INFO("maxim_max30102_init failed.");
+        APP_ERROR_CHECK_BOOL(false);
+    }
+
+    //nrf_delay_ms(1000);
+
+    while(1)
+    {
+        while (!maxim_max30102_data_ready())   //wait until the interrupt pin asserts
+        {
+        }
+
+        // read write ptr, and read ptr
+        // calc number to read
+        uint8_t shouldRead = 0;
+        uint8_t readPtr = 0;
+        uint8_t writePtr = 0;
+        uint8_t read = 0;
+
+        maxim_max30102_read_reg(REG_FIFO_RD_PTR, &readPtr);
+        maxim_max30102_read_reg(REG_FIFO_WR_PTR, &writePtr);
+
+        readPtr = readPtr & 0x1f;
+        writePtr = writePtr & 0x1f;
+
+        if (writePtr <= readPtr)
+        {
+            // FIFO buffer depth is 32
+            writePtr += FIFO_BUFFER_DEPTH;
+            //myuart_printf("w:%i\r\n", (int)(writePtr-readPtr));
+        }
+
+        shouldRead = writePtr - readPtr;
+        read = 0;
+        myuart_printf("w:%i\r\n", (int)(shouldRead));
+
+        if(!maxim_max30102_read_fifo(red, ired, shouldRead))
+        {
+            APP_ERROR_CHECK_BOOL(false);
+        }
+
+        // feed_red_ired(red, ired);
+        while(read < shouldRead)
+        {
+            myuart_printf("r:%i\r\n", red[read]);
+            myuart_printf("ir:%i\r\n", ired[read]);
+            read++;
+        }
+
+        nrf_delay_ms(50);
+    }
+}
 
 /**@brief Function for application main entry.
  */
@@ -1021,6 +1091,8 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");
     //application_timers_start();
+
+    //testHR();
 
     advertising_start(erase_bonds);
 

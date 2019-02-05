@@ -119,7 +119,7 @@ bool maxim_max30102_init()
 */
 {
 //  uint8_t temp = 0xcc;
-  if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0xc0)) // INTR setting, 0xc0
+  if(!maxim_max30102_write_reg(REG_INTR_ENABLE_1,0x80)) // INTR setting, 0xc0
     return false;
 
 //  if (!maxim_max30102_read_reg(REG_INTR_ENABLE_1, &temp))
@@ -186,7 +186,9 @@ bool maxim_max30102_init()
   return true;
 }
 
-bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
+static char ach_i2c_fifo_data[FIFO_BUFFER_DEPTH*6];
+
+bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led, uint32_t toRead)
 /**
 * \brief        Read a set of samples from the MAX30102 FIFO register
 * \par          Details
@@ -200,40 +202,57 @@ bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
 {
   uint32_t un_temp;
   unsigned char uch_temp;
-  *pun_red_led=0;
-  *pun_ir_led=0;
-  char ach_i2c_data[6];
+ 
+  uint32_t read = 0;
+
+  if (toRead > FIFO_BUFFER_DEPTH)
+  {
+      return false;
+  }
 
   //read and clear status register
   maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_temp);
   maxim_max30102_read_reg(REG_INTR_STATUS_2, &uch_temp);
 
-  ach_i2c_data[0]=REG_FIFO_DATA;
-  if(i2c_write(I2C_WRITE_ADDR, ach_i2c_data, 1, true)!=0)
+  ach_i2c_fifo_data[0]=REG_FIFO_DATA;
+  if(i2c_write(I2C_WRITE_ADDR, ach_i2c_fifo_data, 1, true)!=0)
     return false;
-  if(i2c_read(I2C_READ_ADDR, ach_i2c_data, 6, false)!=0)
+
+  if(i2c_read(I2C_READ_ADDR, ach_i2c_fifo_data, 6*toRead, false)!=0)
   {
     return false;
   }
-  un_temp=(unsigned char) ach_i2c_data[0];
-  un_temp<<=16;
-  *pun_red_led+=un_temp;
-  un_temp=(unsigned char) ach_i2c_data[1];
-  un_temp<<=8;
-  *pun_red_led+=un_temp;
-  un_temp=(unsigned char) ach_i2c_data[2];
-  *pun_red_led+=un_temp;
 
-  un_temp=(unsigned char) ach_i2c_data[3];
-  un_temp<<=16;
-  *pun_ir_led+=un_temp;
-  un_temp=(unsigned char) ach_i2c_data[4];
-  un_temp<<=8;
-  *pun_ir_led+=un_temp;
-  un_temp=(unsigned char) ach_i2c_data[5];
-  *pun_ir_led+=un_temp;
-  *pun_red_led&=0x03FFFF;  //Mask MSB [23:18]
-  *pun_ir_led&=0x03FFFF;  //Mask MSB [23:18]
+  while(read < toRead)
+  {
+      *pun_red_led=0;
+      *pun_ir_led=0;
+
+      uch_temp = read*6;
+      un_temp=(unsigned char) ach_i2c_fifo_data[0+uch_temp];
+      un_temp<<=16;
+      *pun_red_led+=un_temp;
+      un_temp=(unsigned char) ach_i2c_fifo_data[1+uch_temp];
+      un_temp<<=8;
+      *pun_red_led+=un_temp;
+      un_temp=(unsigned char) ach_i2c_fifo_data[2+uch_temp];
+      *pun_red_led+=un_temp;
+
+      un_temp=(unsigned char) ach_i2c_fifo_data[3+uch_temp];
+      un_temp<<=16;
+      *pun_ir_led+=un_temp;
+      un_temp=(unsigned char) ach_i2c_fifo_data[4+uch_temp];
+      un_temp<<=8;
+      *pun_ir_led+=un_temp;
+      un_temp=(unsigned char) ach_i2c_fifo_data[5+uch_temp];
+      *pun_ir_led+=un_temp;
+      *pun_red_led&=0x03FFFF;  //Mask MSB [23:18]
+      *pun_ir_led&=0x03FFFF;  //Mask MSB [23:18]
+
+      read++;
+      pun_red_led++;
+      pun_ir_led++;
+  }
 
 
   return true;
@@ -281,7 +300,7 @@ uint32_t maxim_twi_init(void)
     const nrf_drv_twi_config_t twi_max30102_config = {
        .scl                = MAX30102_SCL_PIN,
        .sda                = MAX30102_SDA_PIN,
-       .frequency          = NRF_DRV_TWI_FREQ_100K,
+       .frequency          = NRF_DRV_TWI_FREQ_400K,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
     };
