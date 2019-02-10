@@ -489,8 +489,8 @@ static void services_init(void)
 {
     ret_code_t         err_code;
     ble_hrs_init_t     hrs_init;
-    ble_bas_init_t     bas_init;
-    ble_dis_init_t     dis_init;
+//    ble_bas_init_t     bas_init;
+//    ble_dis_init_t     dis_init;
     nrf_ble_qwr_init_t qwr_init = {0};
     uint8_t            body_sensor_location;
 
@@ -517,30 +517,30 @@ static void services_init(void)
     APP_ERROR_CHECK(err_code);
 
     // Initialize Battery Service.
-    memset(&bas_init, 0, sizeof(bas_init));
+//    memset(&bas_init, 0, sizeof(bas_init));
+//
+//    bas_init.evt_handler          = NULL;
+//    bas_init.support_notification = true;
+//    bas_init.p_report_ref         = NULL;
+//    bas_init.initial_batt_level   = 100;
+//
+//    // Here the sec level for the Battery Service can be changed/increased.
+//    bas_init.bl_rd_sec        = SEC_OPEN;
+//    bas_init.bl_cccd_wr_sec   = SEC_OPEN;
+//    bas_init.bl_report_rd_sec = SEC_OPEN;
 
-    bas_init.evt_handler          = NULL;
-    bas_init.support_notification = true;
-    bas_init.p_report_ref         = NULL;
-    bas_init.initial_batt_level   = 100;
-
-    // Here the sec level for the Battery Service can be changed/increased.
-    bas_init.bl_rd_sec        = SEC_OPEN;
-    bas_init.bl_cccd_wr_sec   = SEC_OPEN;
-    bas_init.bl_report_rd_sec = SEC_OPEN;
-
-    err_code = ble_bas_init(&m_bas, &bas_init);
-    APP_ERROR_CHECK(err_code);
-
-    // Initialize Device Information Service.
-    memset(&dis_init, 0, sizeof(dis_init));
-
-    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char *)MANUFACTURER_NAME);
-
-    dis_init.dis_char_rd_sec = SEC_OPEN;
-
-    err_code = ble_dis_init(&dis_init);
-    APP_ERROR_CHECK(err_code);
+//    err_code = ble_bas_init(&m_bas, &bas_init);
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Initialize Device Information Service.
+//    memset(&dis_init, 0, sizeof(dis_init));
+//
+//    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char *)MANUFACTURER_NAME);
+//
+//    dis_init.dis_char_rd_sec = SEC_OPEN;
+//
+//    err_code = ble_dis_init(&dis_init);
+//    APP_ERROR_CHECK(err_code);
 }
 
 

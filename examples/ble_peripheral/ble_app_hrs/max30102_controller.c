@@ -195,6 +195,8 @@ static void fifo_read_timeout_handler(void * p_context)
     {
         myuart_printf("r:%i\r\n", red[read]);
         myuart_printf("ir:%i\r\n", ired[read]);
+
+        feed_red_ired(red[read], ired[read]);
         read++;
     }
 
