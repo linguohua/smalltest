@@ -1086,7 +1086,7 @@ int main(void)
     conn_params_init();
     peer_manager_init();
 
-    max30102_sensor_init();
+    max30102_sensor_init(&m_hrs);
 
     // Start execution.
     NRF_LOG_INFO("Heart Rate Sensor example started.");

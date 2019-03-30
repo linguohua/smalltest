@@ -13,6 +13,7 @@ static float raw_red_data[RAW_DATA_BUFFER_SIZE];
 static float fft_complex_output[RAW_DATA_BUFFER_SIZE*2];
 static int16_t raw_data_write_index = 0;
 static bool is_activated = false;
+static ble_hrs_t* ptr_hr_service = 0;
 
 static void fifo_read_timeout_handler(void * p_context);
 
@@ -22,6 +23,7 @@ static void do_hr_calc()
 {
     float maxValue;
     uint32_t energyIndex;
+    ret_code_t      err_code;
 
     // move average with window size 11
     move_average(11, raw_red_data, RAW_DATA_BUFFER_SIZE, fft_complex_output);
@@ -48,12 +50,24 @@ static void do_hr_calc()
     arm_max_f32(raw_red_data, RAW_DATA_BUFFER_SIZE/2, &maxValue, &energyIndex);
 
     // heart rate calc
-    float hr = ((float)energyIndex*SAMPLE_RATE/(float)RAW_DATA_BUFFER_SIZE)*60.0f;
+    float hr = (((float)energyIndex)*SAMPLE_RATE/(float)RAW_DATA_BUFFER_SIZE)*60.0f;
 
     // output result
     NRF_LOG_INFO("energyIndex:%i\r\n", energyIndex);   
     NRF_LOG_INFO("hr:%i\r\n", (int)hr);
     NRF_LOG_FLUSH();
+
+
+    err_code = ble_hrs_heart_rate_measurement_send(ptr_hr_service, (int)hr);
+    if ((err_code != NRF_SUCCESS) &&
+        (err_code != NRF_ERROR_INVALID_STATE) &&
+        (err_code != NRF_ERROR_RESOURCES) &&
+        (err_code != NRF_ERROR_BUSY) &&
+        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+       )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
 }
 
 void feed_red_ired(float red, float ired)
@@ -71,7 +85,7 @@ void feed_red_ired(float red, float ired)
 }
 
 
-void max30102_sensor_init(void)
+void max30102_sensor_init(ble_hrs_t* hr_service)
 {
     if (maxim_twi_init() != 0)
     {
@@ -102,6 +116,8 @@ void max30102_sensor_init(void)
                                 fifo_read_timeout_handler);
 
     APP_ERROR_CHECK(err_code);
+
+    ptr_hr_service = hr_service;
 }
 
 void max30102_sensor_start(void)

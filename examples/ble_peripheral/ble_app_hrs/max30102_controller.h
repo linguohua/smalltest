@@ -4,6 +4,7 @@
 #include "app_util_platform.h"
 #include "ble.h"
 #include "stdbool.h"
+#include "ble_hrs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +21,7 @@ extern "C" {
 
 void feed_red_ired(float red, float ired);
 
-void max30102_sensor_init(void);
+void max30102_sensor_init(ble_hrs_t* hr_service);
 
 void max30102_sensor_start(void);
 
