@@ -9,8 +9,8 @@ extern "C" {
 #endif
 
 #define MAX30102_INT_PIN 3
-#define MAX30102_SDA_PIN 4
-#define MAX30102_SCL_PIN 5
+#define MAX30102_SCL_PIN 4
+#define MAX30102_SDA_PIN 5
 
 #define FIFO_BUFFER_DEPTH 32
 

@@ -10,7 +10,9 @@
 extern "C" {
 #endif
 
-#define SAMPLE_RATE (100.0f)
+#define SAMPLE_RATE (100)
+
+#define SMAPLES_LENGTH ((int)(5*SAMPLE_RATE))
 #define RAW_DATA_BUFFER_SIZE 512
 
 #define RTC1_TICKS_PER_SECOND 32768 //

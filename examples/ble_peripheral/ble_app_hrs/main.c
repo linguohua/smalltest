@@ -1071,6 +1071,8 @@ int main(void)
     timers_init();
     buttons_leds_init(&erase_bonds);
 
+    bsp_board_leds_off();
+
     voice_init();
     myuart_init(false);
 
@@ -1096,8 +1098,8 @@ int main(void)
 
     advertising_start(erase_bonds);
 
-    // turn on leds
-    bsp_board_leds_on();
+    // turn off leds
+    bsp_board_leds_off();
 
     // Enter main loop.
     for (;;)
