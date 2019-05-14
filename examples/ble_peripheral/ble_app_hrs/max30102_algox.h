@@ -12,7 +12,10 @@ extern "C" {
 void move_average(int window, const float* ptrInput, int32_t length, float* ptrOutput);
 void array_sub(const float* ptrSrc1, int32_t length, const float* ptrSrc2, float* ptrOutput);
 void array_copy(const float* ptrSrc, int32_t length, float* ptrDst);
+void hr_calc_init();
+int hr_calc(float* raw_red_data);
 
+#define USE_FFT 0
 #ifdef __cplusplus
 }
 #endif
