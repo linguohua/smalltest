@@ -41,7 +41,9 @@ static void do_hr_calc()
 
     /* Process the data through the Complex Magnitude Module for
     calculating the magnitude at each bin */
-    arm_cmplx_mag_f32(fft_complex_output, calc_buf, RAW_DATA_BUFFER_SIZE);
+    arm_cmplx_mag_f32(fft_complex_output+2, calc_buf+1, RAW_DATA_BUFFER_SIZE/2-1);
+    calc_buf[0]          = 0; // DC set to zero
+    calc_buf[RAW_DATA_BUFFER_SIZE/2]          = 0; // DC set to zero
 
     // max magitude
     // max magitude freq
@@ -49,17 +51,20 @@ static void do_hr_calc()
     arm_max_f32(calc_buf, RAW_DATA_BUFFER_SIZE/2, &maxValue, &energyIndex);
 
     // heart rate calc
-    float hr = (((float)energyIndex)*(float)SAMPLE_RATE/(float)RAW_DATA_BUFFER_SIZE)*60.0f;
+    float hr = (((float)energyIndex)*(float)SAMPLE_RATE*60.0f/(float)RAW_DATA_BUFFER_SIZE);
 
     // output result
+    NRF_LOG_INFO("maxValue:%i\r\n", (int)maxValue);
     NRF_LOG_INFO("energyIndex:%i\r\n", energyIndex);
-    NRF_LOG_INFO("hr:%i\r\n", (int)hr);
+
     NRF_LOG_FLUSH();
 
-    if (hr < 45 && hr > 200)
+    if (maxValue < 10000.0f || (hr < 45 || hr > 200))
     {
-        return;
+        hr = 0;
     }
+
+    NRF_LOG_INFO("hr:%i\r\n", (int)hr);
 
     err_code = ble_hrs_heart_rate_measurement_send(ptr_hr_service, (int)hr);
     if ((err_code != NRF_SUCCESS) &&
@@ -153,6 +158,8 @@ void max30102_sensor_start(void)
         NRF_LOG_INFO("maxim_max30102_init failed.");
         APP_ERROR_CHECK_BOOL(false);
     }
+
+    raw_data_write_index = 0;
 
     // start timer
     ret_code_t      err_code;
